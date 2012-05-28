@@ -38,11 +38,12 @@
 
   <modules>
     <module>build-tools</module>
-    <module>cli</module>
+<!--     <module>cli</module> -->
     <module>core</module>
-    <module>examples</module>
+<!--     <module>examples</module> -->
     <module>services/cassandra</module>
-    <module>services/cdh</module>
+    <module>services/ycsb</module>
+<!--     <module>services/cdh</module>
     <module>services/cdh-oldtests</module>
     <module>services/ganglia</module>
     <module>services/hadoop</module>
@@ -55,7 +56,7 @@
     <module>services/chef</module>
     <module>services/mahout</module>
     <module>services/pig</module>
-    <module>services/solr</module>
+    <module>services/solr</module> -->
   </modules>
 
   <properties>

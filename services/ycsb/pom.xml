@@ -38,7 +38,19 @@
       org.apache.whirr.service.ycsb*;version="${project.version}"
     </osgi.export>
     <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.osgi.version.clean}"</osgi.fragment.host>
+    
+    <!-- YCSB properties -->
+    <ycsb.version>0.1.4</ycsb.version>
+    <hbase.version>0.90.5</hbase.version>
+    <cassandra.version>0.7.0</cassandra.version>
+    <infinispan.version>7.1.0.CR1</infinispan.version>
+    <openjpa.jdbc.version>2.1.1</openjpa.jdbc.version>
+    <mapkeeper.version>1.0</mapkeeper.version>
+    <mongodb.version>2.7.2</mongodb.version>
+    <redis.version>2.0.0</redis.version>
+    <voldemort.version>0.81</voldemort.version>
   </properties>
+  
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -52,6 +64,20 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <!-- YCSB dependencies start -->
+    <dependency>
+      <groupId>com.yahoo.ycsb</groupId>
+      <artifactId>core</artifactId>
+      <version>${ycsb.version}</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>com.yahoo.ycsb</groupId>
+      <artifactId>cassandra-binding</artifactId>
+      <version>${ycsb.version}</version>
+      <type>jar</type>
+    </dependency>   
+    <!-- YCSB dependencies end --> 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -72,12 +98,6 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.yahoo.ycsb</groupId>
-      <artifactId>ycsb</artifactId>
-      <version>0.1.4</version>
-      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
