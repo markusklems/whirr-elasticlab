@@ -107,6 +107,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-ycsb</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>whirr-yarn</artifactId>
       <version>${project.version}</version>
     </dependency>
