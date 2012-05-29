@@ -9,3 +9,4 @@ target
 services/voldemort/lib/
 whirr.log
 conf/credentials
+.git
