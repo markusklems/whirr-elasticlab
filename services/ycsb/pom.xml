@@ -66,6 +66,12 @@
       <scope>test</scope>
     </dependency>
     <!-- YCSB dependencies start -->
+<!--     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-cassandra</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+    </dependency> -->
     <!-- <dependency>
       <groupId>com.yahoo.ycsb</groupId>
       <artifactId>root</artifactId>
