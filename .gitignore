@@ -10,3 +10,4 @@ services/voldemort/lib/
 whirr.log
 conf/credentials
 .git
+whirr.log.*
