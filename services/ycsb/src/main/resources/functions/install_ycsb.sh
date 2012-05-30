@@ -19,19 +19,22 @@ function install_ycsb() {
   Y_MAJOR_VERSION=${1:-0.1.4}
   Y_TAR_URL=${2:-https://github.com/downloads/brianfrankcooper/YCSB/ycsb-0.1.4.tar.gz}
   Y_DB=${3:-basic}
-  Y_WORKLOADS_DIR=$YCSB_HOME/workloads
-  Y_WORKLOAD_FILE=$Y_WORKLOADS_DIR/${4:-workloada}
-  Y_REPORT_FILE=$YCSB_HOME/reports/${4:-workloada} 
  
   y_tar_file=`basename $Y_TAR_URL`
-  y_tar_dir=`echo $y_tar_file | awk -F '-bin' '{print $1}'`
+  y_tar_dir=`echo $y_tar_file | awk -F '.tar.gz' '{print $1}'`
   
   YCSB_HOME=/usr/local/$y_tar_dir
   
-  install_tarball $Y_TAR_URL
-  
+  install_tarball_no_md5 $Y_TAR_URL
+
+  Y_WORKLOADS_DIR=$YCSB_HOME/workloads
+  Y_WORKLOAD_FILE=$Y_WORKLOADS_DIR/${4:-workloada}
+  Y_REPORT_FILE=$YCSB_HOME/reports/${4:-workloada}   
+    
+  echo "export YCSB_WORKLOAD_FILE=$Y_WORKLOAD_FILE" >> /etc/profile    
   echo "export YCSB_HOME=$YCSB_HOME" >> /etc/profile
   echo 'export PATH=$YCSB_HOME/bin:$PATH' >> /etc/profile
+  source /etc/p
   
   cat >/etc/init.d/ycsb <<END_OF_FILE
 #!/bin/bash
@@ -128,7 +131,6 @@ exit
 END_OF_FILE
 
   chmod +x /etc/init.d/ycsb
-  install_service ycsb
-
+  install_service
 }
 
