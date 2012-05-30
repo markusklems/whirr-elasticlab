@@ -40,132 +40,142 @@ import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.jclouds.StatementBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
 
-  public static final String CASSANDRA_ROLE = "cassandra";
-  public static final int CLIENT_PORT = 9160;
-  public static final int JMX_PORT = 7199;
+	private static final Logger LOG = LoggerFactory
+			.getLogger(CassandraClusterActionHandler.class);
 
-  public static final String BIN_TARBALL = "whirr.cassandra.tarball.url";
-  public static final String MAJOR_VERSION = "whirr.cassandra.version.major";
+	public static final String CASSANDRA_ROLE = "cassandra";
+	public static final int CLIENT_PORT = 9160;
+	public static final int JMX_PORT = 7199;
 
-  @Override
-  public String getRole() {
-    return CASSANDRA_ROLE;
-  }
+	public static final String BIN_TARBALL = "whirr.cassandra.tarball.url";
+	public static final String MAJOR_VERSION = "whirr.cassandra.version.major";
 
-  @Override
-  protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    ClusterSpec clusterSpec = event.getClusterSpec();
-    Configuration conf = clusterSpec.getConfiguration();
-    
-    addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
-    addStatement(event, call("install_tarball"));
+	@Override
+	public String getRole() {
+		return CASSANDRA_ROLE;
+	}
 
-    addStatement(event, call("install_service"));
-    addStatement(event, call("remove_service"));
+	@Override
+	protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
+		ClusterSpec clusterSpec = event.getClusterSpec();
+		Configuration conf = clusterSpec.getConfiguration();
 
-    Configuration config = clusterSpec.getConfiguration();
+		addStatement(event,
+				call(getInstallFunction(conf, "java", "install_openjdk")));
+		addStatement(event, call("install_tarball"));
+		addStatement(event, call("install_service"));
+		addStatement(event, call("remove_service"));
 
-    String tarball = prepareRemoteFileUrl(event, config.getString(BIN_TARBALL, null));
-    String major = config.getString(MAJOR_VERSION, null);
+		Configuration config = clusterSpec.getConfiguration();
 
-    if (tarball != null && major != null) {
-      addStatement(event, call("install_cassandra", major, tarball));
-    } else {
-      addStatement(event, call("install_cassandra"));
-    }
-  }
+		String tarball = prepareRemoteFileUrl(event,
+				config.getString(BIN_TARBALL, null));
+		String major = config.getString(MAJOR_VERSION, null);
 
-  @Override
-  protected void beforeConfigure(final ClusterActionEvent event)
-    throws IOException, InterruptedException {
-    Cluster cluster = event.getCluster();
-    Set<Instance> instances = cluster.getInstancesMatching(role(CASSANDRA_ROLE));
+		if (tarball != null && major != null) {
+			addStatement(event, call("install_cassandra", major, tarball));
+		} else {
+			addStatement(event, call("install_cassandra"));
+		}
+	}
 
-    event.getFirewallManager().addRule(
-      Rule.create()
-        .destination(instances)
-        .ports(CLIENT_PORT, JMX_PORT)
-    );
+	@Override
+	protected void beforeConfigure(final ClusterActionEvent event)
+			throws IOException, InterruptedException {
+		Cluster cluster = event.getCluster();
+		Set<Instance> instances = cluster
+				.getInstancesMatching(role(CASSANDRA_ROLE));
 
-    setInitialTokensAsEnvironmentVariables(event, instances);
+		event.getFirewallManager().addRule(
+				Rule.create().destination(instances)
+						.ports(CLIENT_PORT, JMX_PORT));
 
-    List<Instance> seeds = getSeeds(instances);
-    String seedServers = Joiner.on(' ').join(getPrivateIps(seeds));
+		setInitialTokensAsEnvironmentVariables(event, instances);
 
-    addStatement(event, call("configure_cassandra", seedServers));
-  }
+		List<Instance> seeds = getSeeds(instances);
+		String seedServers = Joiner.on(' ').join(getPrivateIps(seeds));
 
-  @Override
-  protected void beforeStart(ClusterActionEvent event) {
-    addStatement(event, call("start_cassandra"));
-  }
+		addStatement(event, call("configure_cassandra", seedServers));
+	}
 
-  @Override
-  protected void beforeStop(ClusterActionEvent event) {
-    addStatement(event, call("stop_cassandra"));
-  }
+	@Override
+	protected void beforeStart(ClusterActionEvent event) {
+		addStatement(event, call("start_cassandra"));
+		// Configure the YCSB setup
+		addStatement(event, call("configure_ycsb"));
+	}
 
-  @Override
-  protected void beforeCleanup(ClusterActionEvent event) {
-    addStatement(event, call("remove_service"));
-    addStatement(event, call("cleanup_cassandra"));
-  }
+	@Override
+	protected void beforeStop(ClusterActionEvent event) {
+		addStatement(event, call("stop_cassandra"));
+	}
 
-  private List<String> getPrivateIps(List<Instance> instances) {
-    return Lists.transform(Lists.newArrayList(instances),
-      new Function<Instance, String>() {
-        @Override
-        public String apply(Instance instance) {
-          return instance.getPrivateIp();
-        }
-      });
-  }
+	@Override
+	protected void beforeCleanup(ClusterActionEvent event) {
+		addStatement(event, call("remove_service"));
+		addStatement(event, call("cleanup_cassandra"));
+	}
 
-  /**
-   * Pick a selection of the nodes that are to become seeds. TODO improve
-   * selection method. Right now it picks 20% of the nodes as seeds, or a
-   * minimum of one node if it is a small cluster.
-   *
-   * @param instances all nodes in cluster
-   * @return list of seeds
-   */
-  protected List<Instance> getSeeds(Set<Instance> instances) {
-    List<Instance> nodes = Lists.newArrayList(instances);
-    int seeds = (int) Math.ceil(Math.max(1, instances.size() * 0.2));
-    List<Instance> rv = Lists.newArrayList();
-    for (int i = 0; i < seeds; i++) {
-      rv.add(nodes.get(i));
-    }
-    return rv;
-  }
+	private List<String> getPrivateIps(List<Instance> instances) {
+		return Lists.transform(Lists.newArrayList(instances),
+				new Function<Instance, String>() {
+					@Override
+					public String apply(Instance instance) {
+						return instance.getPrivateIp();
+					}
+				});
+	}
 
-  /**
-   * Compute initial_token for a balanced cluster
-   */
-  protected List<String> computeInitialTokens(int numberOfNodes) {
-    List<String> tokens = Lists.newArrayList();
+	/**
+	 * Pick a selection of the nodes that are to become seeds. TODO improve
+	 * selection method. Right now it picks 20% of the nodes as seeds, or a
+	 * minimum of one node if it is a small cluster.
+	 * 
+	 * @param instances
+	 *            all nodes in cluster
+	 * @return list of seeds
+	 */
+	protected List<Instance> getSeeds(Set<Instance> instances) {
+		List<Instance> nodes = Lists.newArrayList(instances);
+		int seeds = (int) Math.ceil(Math.max(1, instances.size() * 0.2));
+		List<Instance> rv = Lists.newArrayList();
+		for (int i = 0; i < seeds; i++) {
+			rv.add(nodes.get(i));
+		}
+		return rv;
+	}
 
-    BigInteger step = new BigInteger("2")
-      .pow(127).divide(BigInteger.valueOf(numberOfNodes));
+	/**
+	 * Compute initial_token for a balanced cluster
+	 */
+	protected List<String> computeInitialTokens(int numberOfNodes) {
+		List<String> tokens = Lists.newArrayList();
 
-    for (int i = 0; i < numberOfNodes; i++) {
-      tokens.add(step.multiply(BigInteger.valueOf(i)).toString());
-    }
+		BigInteger step = new BigInteger("2").pow(127).divide(
+				BigInteger.valueOf(numberOfNodes));
 
-    return tokens;
-  }
+		for (int i = 0; i < numberOfNodes; i++) {
+			tokens.add(step.multiply(BigInteger.valueOf(i)).toString());
+		}
 
-  private void setInitialTokensAsEnvironmentVariables(ClusterActionEvent event, Set<Instance> instances) {
-    List<String> tokens = computeInitialTokens(instances.size());
+		return tokens;
+	}
 
-    StatementBuilder statementBuilder = event.getStatementBuilder();
-    Iterator it = tokens.iterator();
+	private void setInitialTokensAsEnvironmentVariables(
+			ClusterActionEvent event, Set<Instance> instances) {
+		List<String> tokens = computeInitialTokens(instances.size());
 
-    for (Instance instance : instances) {
-      statementBuilder.addExportPerInstance(instance.getId(), "cassandraInitialToken", (String) it.next());
-    }
-  }
+		StatementBuilder statementBuilder = event.getStatementBuilder();
+		Iterator it = tokens.iterator();
+
+		for (Instance instance : instances) {
+			statementBuilder.addExportPerInstance(instance.getId(),
+					"cassandraInitialToken", (String) it.next());
+		}
+	}
 }
