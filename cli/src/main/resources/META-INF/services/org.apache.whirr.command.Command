@@ -18,5 +18,6 @@ org.apache.whirr.cli.command.DestroyInstanceCommand
 org.apache.whirr.cli.command.ListClusterCommand
 org.apache.whirr.cli.command.ListProvidersCommand
 org.apache.whirr.cli.command.RunScriptCommand
+org.apache.whirr.cli.command.RunExperimentCommand
 org.apache.whirr.cli.command.VersionCommand
 org.apache.whirr.cli.command.HelpCommand
