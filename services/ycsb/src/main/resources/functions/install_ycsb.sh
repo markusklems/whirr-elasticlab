@@ -34,8 +34,7 @@ function install_ycsb() {
     
   echo "export YCSB_WORKLOAD_FILE=$Y_WORKLOAD_FILE" >> /etc/profile    
   echo "export YCSB_HOME=$YCSB_HOME" >> /etc/profile
-  echo 'export PATH=$YCSB_HOME/bin:$PATH' >> /etc/profile
-  echo 'export YCSB_REPORT_FILE=$Y_REPORT_FILE' >> /etc/profile  
+  echo 'export PATH=$YCSB_HOME/bin:$PATH' >> /etc/profile 
   source /etc/p
   
   cat >/etc/init.d/ycsb <<END_OF_FILE
@@ -43,6 +42,7 @@ function install_ycsb() {
 
 LOAD="$YCSB_HOME/bin/ycsb load $Y_DB -P $Y_WORKLOAD_FILE"
 RUN="$YCSB_HOME/bin/ycsb run $Y_DB -P $Y_WORKLOAD_FILE"
+REPORT="$Y_REPORT_FILE"
 
 PIDFILE=/var/run/ycsb.pid
 
@@ -86,7 +86,7 @@ run(){
         echo "Failed. Maybe remove \$PIDFILE?"
         false
     else      
-        \$RUN -s > $YCSB_REPORT_FILE
+        \$RUN -s > \$REPORT
         PID=\$!
         mkdir -p \`dirname \$PIDFILE\`
         echo \$PID > \$PIDFILE
