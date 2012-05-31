@@ -29,18 +29,20 @@ function install_ycsb() {
 
   Y_WORKLOADS_DIR=$YCSB_HOME/workloads
   Y_WORKLOAD_FILE=$Y_WORKLOADS_DIR/${4:-workloada}
-  Y_REPORT_FILE=$YCSB_HOME/reports/${4:-workloada}   
+  Y_REPORT_FILE=$YCSB_HOME/reports/${4:-workloada}
+  mkdir $YCSB_HOME/reports
     
   echo "export YCSB_WORKLOAD_FILE=$Y_WORKLOAD_FILE" >> /etc/profile    
   echo "export YCSB_HOME=$YCSB_HOME" >> /etc/profile
   echo 'export PATH=$YCSB_HOME/bin:$PATH' >> /etc/profile
+  echo 'export YCSB_REPORT_FILE=$Y_REPORT_FILE' >> /etc/profile  
   source /etc/p
   
   cat >/etc/init.d/ycsb <<END_OF_FILE
 #!/bin/bash
 
 LOAD="$YCSB_HOME/bin/ycsb load $Y_DB -P $Y_WORKLOAD_FILE"
-RUN="$YCSB_HOME/bin/ycsb run $Y_DB -P $Y_WORKLOAD_FILE -s > $Y_REPORT_FILE"
+RUN="$YCSB_HOME/bin/ycsb run $Y_DB -P $Y_WORKLOAD_FILE"
 
 PIDFILE=/var/run/ycsb.pid
 
@@ -64,7 +66,6 @@ load(){
         echo "Failed. Maybe remove \$PIDFILE?"
         false
     else
-        mkdir -p \`dirname \$Y_WORKLOAD_FILE\`
         \$LOAD
         PID=\$!
         mkdir -p \`dirname \$PIDFILE\`
@@ -84,10 +85,8 @@ run(){
     if running; then
         echo "Failed. Maybe remove \$PIDFILE?"
         false
-    else
-        mkdir -p \`dirname \$Y_WORKLOAD_FILE\`
-        mkdir -p \`dirname \$Y_REPORT_FILE\`        
-        \$RUN
+    else      
+        \$RUN -s > $YCSB_REPORT_FILE
         PID=\$!
         mkdir -p \`dirname \$PIDFILE\`
         echo \$PID > \$PIDFILE

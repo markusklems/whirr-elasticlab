@@ -19,9 +19,7 @@ import org.apache.whirr.service.FirewallManager.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 
@@ -106,6 +104,19 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		while (it.hasNext())
 			toReturn.add(it.next().getPrivateIp());
 		return toReturn;
+	}
+
+	@Override
+	protected void beforeRunExperiment(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+		addStatement(event, call("load_ycsb"));
+		addStatement(event, call("run_ycsb"));
+	}
+	
+	@Override
+	protected void afterRunExperiment(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+		// ... download stats
 	}
 
 	// @Override
