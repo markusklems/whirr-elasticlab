@@ -36,6 +36,7 @@ public interface ClusterActionHandler {
   String STOP_ACTION = "stop";
   String CLEANUP_ACTION = "cleanup";
   String DESTROY_ACTION = "destroy";
+  String RUN_EXPERIMENT_ACTION = "run_experiment";
 
   String getRole();
 

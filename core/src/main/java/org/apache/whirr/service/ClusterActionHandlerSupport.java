@@ -41,232 +41,273 @@ import com.google.common.base.Objects;
  * {@link ClusterActionHandler}. For each 'before' and 'after' action type there
  * is a corresponding method that implementations may override.
  */
-public abstract class ClusterActionHandlerSupport implements ClusterActionHandler {
+public abstract class ClusterActionHandlerSupport implements
+		ClusterActionHandler {
 
-  private static final Logger LOG =
-    LoggerFactory.getLogger(ClusterActionHandler.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(ClusterActionHandler.class);
 
-  public void beforeAction(ClusterActionEvent event)
-      throws IOException, InterruptedException{
-    if (event.getAction().equals(BOOTSTRAP_ACTION)) {
-      beforeBootstrap(event);
-    } else if (event.getAction().equals(CONFIGURE_ACTION)) {
-      beforeConfigure(event);
-    } else if (event.getAction().equals(START_ACTION)) {
-      beforeStart(event);
-    } else if (event.getAction().equals(STOP_ACTION)) {
-      beforeStop(event);
-    } else if (event.getAction().equals(CLEANUP_ACTION)) {
-      beforeCleanup(event);
-    } else if (event.getAction().equals(DESTROY_ACTION)) {
-      beforeDestroy(event);
-    } else {
-      beforeOtherAction(event);
-    }
-  }
+	public void beforeAction(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+		if (event.getAction().equals(BOOTSTRAP_ACTION)) {
+			beforeBootstrap(event);
+		} else if (event.getAction().equals(CONFIGURE_ACTION)) {
+			beforeConfigure(event);
+		} else if (event.getAction().equals(START_ACTION)) {
+			beforeStart(event);
+		} else if (event.getAction().equals(STOP_ACTION)) {
+			beforeStop(event);
+		} else if (event.getAction().equals(CLEANUP_ACTION)) {
+			beforeCleanup(event);
+		} else if (event.getAction().equals(DESTROY_ACTION)) {
+			beforeDestroy(event);
+		} else if (event.getAction().equals(RUN_EXPERIMENT_ACTION)) {
+			beforeRunExperiment(event);
+		} else {
+			beforeOtherAction(event);
+		}
+	}
 
-  public void afterAction(ClusterActionEvent event)
-      throws IOException, InterruptedException {
-    if (event.getAction().equals(BOOTSTRAP_ACTION)) {
-      afterBootstrap(event);
-    } else if (event.getAction().equals(CONFIGURE_ACTION)) {
-      afterConfigure(event);
-    } else if (event.getAction().equals(START_ACTION)) {
-      afterStart(event);
-    } else if (event.getAction().equals(STOP_ACTION)) {
-      afterStop(event);
-    } else if (event.getAction().equals(CLEANUP_ACTION)) {
-      afterCleanup(event);
-    } else if (event.getAction().equals(DESTROY_ACTION)) {
-      afterDestroy(event);
-    } else {
-      afterOtherAction(event);
-    }
-  }
-  
-  protected void beforeBootstrap(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
-  
-  protected void beforeConfigure(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	public void afterAction(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+		if (event.getAction().equals(BOOTSTRAP_ACTION)) {
+			afterBootstrap(event);
+		} else if (event.getAction().equals(CONFIGURE_ACTION)) {
+			afterConfigure(event);
+		} else if (event.getAction().equals(START_ACTION)) {
+			afterStart(event);
+		} else if (event.getAction().equals(STOP_ACTION)) {
+			afterStop(event);
+		} else if (event.getAction().equals(CLEANUP_ACTION)) {
+			afterCleanup(event);
+		} else if (event.getAction().equals(DESTROY_ACTION)) {
+			afterDestroy(event);
+		} else if (event.getAction().equals(RUN_EXPERIMENT_ACTION)) {
+			afterRunExperiment(event);
+		} else {
+			afterOtherAction(event);
+		}
+	}
 
-  protected void beforeStart(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	protected void beforeBootstrap(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+	}
 
-  protected void beforeStop(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	protected void beforeConfigure(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+	}
 
-  protected void beforeCleanup(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	protected void beforeStart(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-  protected void beforeDestroy(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	protected void beforeStop(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-  protected void beforeOtherAction(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
-  
-  protected void afterBootstrap(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
-  
-  protected void afterConfigure(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	protected void beforeCleanup(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-  protected void afterStart(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	protected void beforeDestroy(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-  protected void afterStop(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	protected void beforeOtherAction(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+	}
 
-  protected void afterCleanup(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
-  
-  protected void afterDestroy(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
+	protected void afterBootstrap(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-  protected void afterOtherAction(ClusterActionEvent event)
-    throws IOException, InterruptedException { }
-  
-  /**
-   * Returns a composite configuration that is made up from the global
-   * configuration coming from the Whirr core with the service default
-   * properties.
-   *
-   * @param clusterSpec  The cluster specification instance.
-   * @return The composite configuration.
-   */
-  protected Configuration getConfiguration(
-      ClusterSpec clusterSpec, Configuration defaults) {
-    CompositeConfiguration cc = new CompositeConfiguration();
-    cc.addConfiguration(clusterSpec.getConfiguration());
-    cc.addConfiguration(defaults);
-    return cc;
-  }
+	protected void afterConfigure(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-  protected Configuration getConfiguration(ClusterSpec clusterSpec,
-      String defaultsPropertiesFile) throws IOException {
-    try {
-      return getConfiguration(clusterSpec,
-          new PropertiesConfiguration(getClass().getClassLoader().getResource(defaultsPropertiesFile)));
-    } catch(ConfigurationException e) {
-      throw new IOException("Error loading " + defaultsPropertiesFile, e);
-    }
- }
-  
-  /**
-   * A convenience method for adding a {@link RunUrlStatement} to a
-   * {@link ClusterActionEvent}.
-   */
-  public static void addRunUrl(ClusterActionEvent event, String runUrl,
-      String... args)
-      throws IOException {
-    Statement statement = new RunUrlStatement(
-        event.getClusterSpec().getRunUrlBase(), runUrl, args);
-    addStatement(event, statement);
-  }
+	protected void afterStart(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-  public static void addStatement(ClusterActionEvent event, Statement statement) {
-    event.getStatementBuilder().addStatement(statement);
-  }
+	protected void afterStop(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-  /**
-   * Prepare the file url for the remote machine.
-   *
-   * For public urls this function does nothing. For local urls it uploads the files to a
-   * temporary blob cache and adds download statement.
-   *
-   * @param rawUrl    raw url as provided in the configuration file
-   * @return  an URL visible to the install / configure scripts
-   */
-  public static String prepareRemoteFileUrl(ClusterActionEvent event, String rawUrl)
-      throws IOException {
-    if (rawUrl != null && rawUrl.startsWith("file://")) {
-      try {
-        URI uri = new URI(rawUrl);
-        File localFile = new File(uri);
+	protected void afterCleanup(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-        BlobCache cache = BlobCache.getInstance(event.getCompute(), event.getClusterSpec());
-        cache.putIfAbsent(localFile);
+	protected void afterDestroy(ClusterActionEvent event) throws IOException,
+			InterruptedException {
+	}
 
-        final String basePath = "/tmp/whirr/cache/files/";
-        addStatement(event, cache.getAsSaveToStatement(basePath, uri));
-        return "file://" + basePath + localFile.getName();
+	protected void afterOtherAction(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+	}
 
-      } catch (URISyntaxException e) {
-        throw new IOException(e);
-      }
-    } else if(rawUrl != null && rawUrl.startsWith("remote://")) {
-      return rawUrl.replaceFirst("remote://", "file://");
-    }
-    return rawUrl;
-  }
+	protected void beforeRunExperiment(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+	}
 
-  /**
-   * Get service start function name from the configuration
-   */
-  public String getStartFunction(Configuration config, String service, String defaultFunction) {
-    return getFunctionName(config, service, "start", defaultFunction);
-  }
+	protected void afterRunExperiment(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+	}
 
-  /**
-   * Get service start function name from the configuration
-   */
-  public String getStopFunction(Configuration config, String service, String defaultFunction) {
-    return getFunctionName(config, service, "stop", defaultFunction);
-  }
+	/**
+	 * Returns a composite configuration that is made up from the global
+	 * configuration coming from the Whirr core with the service default
+	 * properties.
+	 * 
+	 * @param clusterSpec
+	 *            The cluster specification instance.
+	 * @return The composite configuration.
+	 */
+	protected Configuration getConfiguration(ClusterSpec clusterSpec,
+			Configuration defaults) {
+		CompositeConfiguration cc = new CompositeConfiguration();
+		cc.addConfiguration(clusterSpec.getConfiguration());
+		cc.addConfiguration(defaults);
+		return cc;
+	}
 
-  /**
-   * Get service install function name from the configuration
-   */
-  public String getInstallFunction(Configuration config, String service, String defaultFunction) {
-    return getFunctionName(config, service, "install", defaultFunction);
-  }
+	protected Configuration getConfiguration(ClusterSpec clusterSpec,
+			String defaultsPropertiesFile) throws IOException {
+		try {
+			return getConfiguration(clusterSpec,
+					new PropertiesConfiguration(getClass().getClassLoader()
+							.getResource(defaultsPropertiesFile)));
+		} catch (ConfigurationException e) {
+			throw new IOException("Error loading " + defaultsPropertiesFile, e);
+		}
+	}
 
-  /**
-   * Get service configure function name from the configuration
-   */
-  public String getConfigureFunction(Configuration config, String service, String defaultFunction) {
-    return getFunctionName(config, service, "configure", defaultFunction);
-  }
+	/**
+	 * A convenience method for adding a {@link RunUrlStatement} to a
+	 * {@link ClusterActionEvent}.
+	 */
+	public static void addRunUrl(ClusterActionEvent event, String runUrl,
+			String... args) throws IOException {
+		Statement statement = new RunUrlStatement(event.getClusterSpec()
+				.getRunUrlBase(), runUrl, args);
+		addStatement(event, statement);
+	}
 
-  /**
-   * Get service cleanup function name from the configuration
-   */
-  public String getCleanupFunction(Configuration config, String service, String defaultFunction) {
-    return getFunctionName(config, service, "cleanup", defaultFunction);
-  }
+	public static void addStatement(ClusterActionEvent event,
+			Statement statement) {
+		event.getStatementBuilder().addStatement(statement);
+	}
 
-  public String getFunctionName(Configuration config, String service, String functionName, String defaultFunction) {
+	/**
+	 * Prepare the file url for the remote machine.
+	 * 
+	 * For public urls this function does nothing. For local urls it uploads the
+	 * files to a temporary blob cache and adds download statement.
+	 * 
+	 * @param rawUrl
+	 *            raw url as provided in the configuration file
+	 * @return an URL visible to the install / configure scripts
+	 */
+	public static String prepareRemoteFileUrl(ClusterActionEvent event,
+			String rawUrl) throws IOException {
+		if (rawUrl != null && rawUrl.startsWith("file://")) {
+			try {
+				URI uri = new URI(rawUrl);
+				File localFile = new File(uri);
 
-    String deprecatedKey = String.format("whirr.%s-%s-function", service, functionName);
-    String key = String.format("whirr.%s.%s-function", service, functionName);
+				BlobCache cache = BlobCache.getInstance(event.getCompute(),
+						event.getClusterSpec());
+				cache.putIfAbsent(localFile);
 
-    if (config.containsKey(deprecatedKey)) {
-      LOG.warn("'{}' is deprecated. Replace with '{}'", deprecatedKey, key);
-      return config.getString(deprecatedKey);
-    }
+				final String basePath = "/tmp/whirr/cache/files/";
+				addStatement(event, cache.getAsSaveToStatement(basePath, uri));
+				return "file://" + basePath + localFile.getName();
 
-    return config.getString(key, defaultFunction);
-  }
-  /**
-    * this uses the inefficient {@link com.google.common.base.Objects} implementation as the object count will be
-    * relatively small and therefore efficiency is not a concern.
-    */
-   @Override
-   public int hashCode() {
-      return Objects.hashCode(getRole());
-   }
+			} catch (URISyntaxException e) {
+				throw new IOException(e);
+			}
+		} else if (rawUrl != null && rawUrl.startsWith("remote://")) {
+			return rawUrl.replaceFirst("remote://", "file://");
+		}
+		return rawUrl;
+	}
 
-   @Override
-   public boolean equals(Object that) {
-      if (that == null)
-         return false;
-      return Objects.equal(this.toString(), that.toString());
-   }
+	/**
+	 * Get service start function name from the configuration
+	 */
+	public String getStartFunction(Configuration config, String service,
+			String defaultFunction) {
+		return getFunctionName(config, service, "start", defaultFunction);
+	}
 
-   @Override
-   public String toString() {
-      return Objects.toStringHelper(this).add("role", getRole()).toString();
-   }
+	/**
+	 * Get service start function name from the configuration
+	 */
+	public String getStopFunction(Configuration config, String service,
+			String defaultFunction) {
+		return getFunctionName(config, service, "stop", defaultFunction);
+	}
 
+	/**
+	 * Get service install function name from the configuration
+	 */
+	public String getInstallFunction(Configuration config, String service,
+			String defaultFunction) {
+		return getFunctionName(config, service, "install", defaultFunction);
+	}
+
+	/**
+	 * Get service configure function name from the configuration
+	 */
+	public String getConfigureFunction(Configuration config, String service,
+			String defaultFunction) {
+		return getFunctionName(config, service, "configure", defaultFunction);
+	}
+
+	/**
+	 * Get service cleanup function name from the configuration
+	 */
+	public String getCleanupFunction(Configuration config, String service,
+			String defaultFunction) {
+		return getFunctionName(config, service, "cleanup", defaultFunction);
+	}
+
+	public String getFunctionName(Configuration config, String service,
+			String functionName, String defaultFunction) {
+
+		String deprecatedKey = String.format("whirr.%s-%s-function", service,
+				functionName);
+		String key = String.format("whirr.%s.%s-function", service,
+				functionName);
+
+		if (config.containsKey(deprecatedKey)) {
+			LOG.warn("'{}' is deprecated. Replace with '{}'", deprecatedKey,
+					key);
+			return config.getString(deprecatedKey);
+		}
+
+		return config.getString(key, defaultFunction);
+	}
+
+	/**
+	 * this uses the inefficient {@link com.google.common.base.Objects}
+	 * implementation as the object count will be relatively small and therefore
+	 * efficiency is not a concern.
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getRole());
+	}
+
+	@Override
+	public boolean equals(Object that) {
+		if (that == null)
+			return false;
+		return Objects.equal(this.toString(), that.toString());
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this).add("role", getRole()).toString();
+	}
 
 }

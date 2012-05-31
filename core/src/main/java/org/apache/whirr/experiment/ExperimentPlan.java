@@ -1,11 +1,9 @@
 package org.apache.whirr.experiment;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.whirr.Cluster;
-import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.actions.RunExperimentAction;
 
 /**
  * 
@@ -16,7 +14,7 @@ import org.apache.whirr.ClusterSpec;
 public class ExperimentPlan {
 	
 	private List<ExperimentInstance> experiments;
-	
+
 	/**
 	 * @param arg0
 	 * @return
@@ -49,6 +47,8 @@ public class ExperimentPlan {
 	public int size() {
 		return experiments.size();
 	}
+	
+	
 
 //	public void run(Cluster cluster, ClusterSpec clusterSpec) {
 //		for(ExperimentPhase experimentPhase : experiments) {
@@ -62,7 +62,6 @@ public class ExperimentPlan {
 //			}
 //		}
 //	}
-
 
 	public class ExperimentInstance {
 		

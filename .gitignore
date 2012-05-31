@@ -10,4 +10,4 @@ services/voldemort/lib/
 whirr.log
 conf/credentials
 .git
-whirr.log.*
+whirr.log.*services/cassandra/src/test/resources/whirr-cassandra-test.properties
