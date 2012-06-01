@@ -28,7 +28,7 @@ function install_ycsb() {
   install_tarball_no_md5 $Y_TAR_URL
 
   Y_WORKLOADS_DIR=$YCSB_HOME/workloads
-  Y_WORKLOAD_FILE=$Y_WORKLOADS_DIR/${4:-workloada}
+  Y_WORKLOAD_FILE=$Y_WORKLOADS_DIR/performance/${4:-workloada}
   Y_REPORT_FILE=$YCSB_HOME/reports/${4:-workloada}
   mkdir $YCSB_HOME/reports
     
