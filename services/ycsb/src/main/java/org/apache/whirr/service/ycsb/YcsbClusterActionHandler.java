@@ -35,6 +35,7 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	public static final String MAJOR_VERSION = "whirr.ycsb.version.major";
 	public static final String DB = "whirr.ycsb.db";
 	public static final String WORKLOAD_FILE = "whirr.ycsb.workload.file";
+	public static final String WORKLOAD_REPO_GIT = "whir.ycsb.workload.repo.git";
 
 	@Override
 	public String getRole() {
@@ -96,6 +97,11 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		List<String> privateIps = getPrivateIps(instances.iterator());
 		String cassandraHosts = Joiner.on(' ').join(privateIps.iterator());
 
+		String repo = event.getClusterSpec().getConfiguration().getString(WORKLOAD_REPO_GIT, null);
+		
+		// install git and clone the workload repository
+		addStatement(event, call("install_git"));
+		addStatement(event, call("update_workload_repo", repo));
 		addStatement(event, call("update_workload_file", cassandraHosts));
 	}
 
