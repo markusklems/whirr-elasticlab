@@ -14,15 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function update_workload_file() {
-  YCSB_WORKLOAD_FILE=/usr/local/ycsb-0.1.4/workloads/performance/workloada 
-
-  hosts="hosts="
-  for server in "$@"; do
-    hosts="${hosts}${server},"
-  done
-  #remove last comma
-  hosts=${hosts%?}
-  # add a blank line and then the hosts line
-  echo >> "$YCSB_WORKLOAD_FILE"; echo "$hosts" >> "$YCSB_WORKLOAD_FILE"
+function update_workload_repo() {
+  YCSB_WORKLOAD_REPO=${1:-git://github.com/markusklems/YCSB-workloads.git}
+  #YCSB_WORKLOAD_REPO_VERSION=${2:-HEAD}
+  
+  # remove the existing workload files
+  rm /usr/local/ycsb-0.1.4/workloads/*
+  
+  # clone repo from git
+  git clone $YCSB_WORKLOAD_REPO /usr/local/ycsb-0.1.4/workloads
+  
 }
