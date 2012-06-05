@@ -30,7 +30,7 @@ function install_ycsb() {
   Y_WORKLOADS_DIR=$YCSB_HOME/workloads
   Y_WORKLOAD_FILE=$Y_WORKLOADS_DIR/performance/${4:-workloada}
   Y_REPORT_FILE=$Y_WORKLOADS_DIR/reports/${4:-workloada}
-  mkdir $Y_WORKLOADS_DIR/reports
+  #mkdir $Y_WORKLOADS_DIR/reports
     
   echo "export YCSB_WORKLOAD_FILE=$Y_WORKLOAD_FILE" >> /etc/profile    
   echo "export YCSB_HOME=$YCSB_HOME" >> /etc/profile
