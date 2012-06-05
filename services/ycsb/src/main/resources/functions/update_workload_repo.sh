@@ -19,7 +19,7 @@ function update_workload_repo() {
   #YCSB_WORKLOAD_REPO_VERSION=${2:-HEAD}
   
   # remove the existing workload files
-  #rm /usr/local/ycsb-0.1.4/workloads/*
+  rm /usr/local/ycsb-0.1.4/workloads/*
   
   # clone repo from git
   git clone $YCSB_WORKLOAD_REPO /usr/local/ycsb-0.1.4/workloads
