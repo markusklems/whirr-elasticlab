@@ -16,7 +16,7 @@
 #
 
 function upload_ycsb_results() {
-  git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" add -a
+  git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" add /usr/local/ycsb-0.1.4/workloads/results/*
   git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" commit -m "new results"
   git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" push
 }
