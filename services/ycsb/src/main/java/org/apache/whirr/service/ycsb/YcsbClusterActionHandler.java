@@ -122,9 +122,9 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	@Override
 	protected void afterRunExperiment(ClusterActionEvent event)
 			throws IOException, InterruptedException {
-		// upload ycsb measurements to github
+		// upload ycsb measurements to github (doesnt work -> why?)
 		addStatement(event, call("upload_ycsb_results"));
-	}
+	}	
 
 	// @Override
 	// protected void afterConfigure(ClusterActionEvent event) throws
