@@ -86,7 +86,7 @@ run(){
         echo "Failed. Maybe remove \$PIDFILE?"
         false
     else      
-        \$RUN -s > \$REPORT
+        \$RUN > \$REPORT
         PID=\$!
         mkdir -p \`dirname \$PIDFILE\`
         echo \$PID > \$PIDFILE
