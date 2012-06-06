@@ -43,6 +43,7 @@ function install_ycsb() {
 LOAD="$YCSB_HOME/bin/ycsb load $Y_DB -P $Y_WORKLOAD_FILE"
 RUN="$YCSB_HOME/bin/ycsb run $Y_DB -P $Y_WORKLOAD_FILE"
 REPORT="$Y_REPORT_FILE"
+LOADREPORT=$REPORT-load
 
 PIDFILE=/var/run/ycsb.pid
 
@@ -66,7 +67,7 @@ load(){
         echo "Failed. Maybe remove \$PIDFILE?"
         false
     else
-        \$LOAD
+        \$LOAD > \$LOADREPORT
         PID=\$!
         mkdir -p \`dirname \$PIDFILE\`
         echo \$PID > \$PIDFILE
