@@ -35,7 +35,7 @@ function install_ycsb() {
   echo "export YCSB_WORKLOAD_FILE=$Y_WORKLOAD_FILE" >> /etc/profile    
   echo "export YCSB_HOME=$YCSB_HOME" >> /etc/profile
   echo 'export PATH=$YCSB_HOME/bin:$PATH' >> /etc/profile 
-  source /etc/p
+  source /etc/profile
   
   cat >/etc/init.d/ycsb <<END_OF_FILE
 #!/bin/bash
