@@ -36,9 +36,9 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	public static final String WORKLOAD_REPO_GIT = "whir.ycsb.workload.repo.git";
 
 	// runExperiment command options
-	public static final String EXPERIMENT_ACTION = "whirr.experiment-action";
-	public static final String DB = "whirr.ycsb-db";
-	public static final String WORKLOAD_FILE = "whirr.ycsb-workload-file";
+	public static final String YCSB_EXPERIMENT_ACTION = "whirr.ycsb-experiment-action";
+	public static final String YCSB_DB = "whirr.ycsb-db";
+	public static final String YCSB_WORKLOAD_FILE = "whirr.ycsb-workload-file";
 
 	public static enum EXPERIMENT_ACTION_VALUE {
 		EXPERIMENT_LOAD("load"), EXPERIMENT_RUN("run"), EXPERIMENT_UPLOAD_DATA(
@@ -137,9 +137,9 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		ClusterSpec clusterSpec = event.getClusterSpec();
 		Configuration config = clusterSpec.getConfiguration();
 
-		String experimentAction = config.getString(EXPERIMENT_ACTION, null);
-		final String db = config.getString(DB, null);
-		final String workload = config.getString(WORKLOAD_FILE, null);
+		String experimentAction = config.getString(YCSB_EXPERIMENT_ACTION, null);
+		final String db = config.getString(YCSB_DB, null);
+		final String workload = config.getString(YCSB_WORKLOAD_FILE, null);
 		final String major = config.getString(MAJOR_VERSION, null);
 		final String load = EXPERIMENT_ACTION_VALUE.EXPERIMENT_LOAD.toString();
 		final String run = EXPERIMENT_ACTION_VALUE.EXPERIMENT_RUN.toString();

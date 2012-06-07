@@ -33,7 +33,6 @@ import org.apache.whirr.actions.DestroyClusterAction;
 import org.apache.whirr.actions.RunExperimentAction;
 import org.apache.whirr.actions.StartServicesAction;
 import org.apache.whirr.actions.StopServicesAction;
-import org.apache.whirr.experiment.ExperimentPlan;
 import org.apache.whirr.service.ComputeCache;
 import org.apache.whirr.state.ClusterStateStore;
 import org.apache.whirr.state.ClusterStateStoreFactory;
@@ -259,11 +258,11 @@ public class ClusterController {
 	 * Start the experiment described by <code>experimentPlan</code> on the
 	 * cluster described by <code>clusterSpec</code>.
 	 */
-	public void launchExperiment(ExperimentPlan experimentPlan,
+	public void launchExperiment(
 			ClusterSpec clusterSpec) throws IOException, InterruptedException {
 
 		Cluster cluster = getClusterStateStore(clusterSpec).load();
-		runExperiment(experimentPlan, clusterSpec, cluster);
+		runExperiment(clusterSpec, cluster);
 
 	}
 
@@ -409,20 +408,20 @@ public class ClusterController {
 		};
 	}
 
-	public Cluster runExperiment(ExperimentPlan experimentPlan, ClusterSpec spec)
+	public Cluster runExperiment(ClusterSpec spec)
 			throws IOException, InterruptedException {
-		return runExperiment(experimentPlan, spec,
+		return runExperiment(spec,
 				new Cluster(getInstances(spec, getClusterStateStore(spec))),
 				EMPTYSET, EMPTYSET);
 	}
 
-	public Cluster runExperiment(ExperimentPlan experimentPlan,
+	public Cluster runExperiment(
 			ClusterSpec spec, Cluster cluster) throws IOException,
 			InterruptedException {
-		return runExperiment(experimentPlan, spec, cluster, EMPTYSET, EMPTYSET);
+		return runExperiment(spec, cluster, EMPTYSET, EMPTYSET);
 	}
 
-	public Cluster runExperiment(ExperimentPlan experimentPlan,
+	public Cluster runExperiment(
 			ClusterSpec clusterSpec, Cluster cluster, Set<String> targetRoles,
 			Set<String> targetInstanceIds) throws IOException,
 			InterruptedException {
