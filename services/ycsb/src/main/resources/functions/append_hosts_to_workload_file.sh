@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function update_workload_file() {
+function append_hosts_to_workload_file() {
   YCSB_WORKLOAD_FILE=/usr/local/ycsb-0.1.4/workloads/performance/workloada 
 
   hosts="hosts="
