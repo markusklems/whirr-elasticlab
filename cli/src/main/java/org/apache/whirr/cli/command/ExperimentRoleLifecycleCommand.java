@@ -7,7 +7,6 @@ import joptsimple.OptionSet;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.experiment.ExperimentPlan;
 import org.apache.whirr.state.ClusterStateStoreFactory;
 
 public abstract class ExperimentRoleLifecycleCommand extends RoleLifecycleCommand {
@@ -18,14 +17,14 @@ public abstract class ExperimentRoleLifecycleCommand extends RoleLifecycleComman
 		super(name, description, factory, stateStoreFactory);
 	}
 
-	public abstract int runExperimentLifecycleStep(ExperimentPlan exmperimentPlan, ClusterSpec clusterSpec,
+	public abstract int runExperimentLifecycleStep(ClusterSpec clusterSpec,
 			ClusterController controller, OptionSet optionSet) throws IOException, InterruptedException;
 
 	@Override
 	public int runLifecycleStep(ClusterSpec clusterSpec,
 			ClusterController controller, OptionSet optionSet)
 			throws IOException, InterruptedException {
-		return runExperimentLifecycleStep(new ExperimentPlan(), clusterSpec,
+		return runExperimentLifecycleStep(clusterSpec,
 				controller, optionSet);
 	}
 
