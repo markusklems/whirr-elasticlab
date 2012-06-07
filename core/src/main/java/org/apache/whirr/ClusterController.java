@@ -261,26 +261,10 @@ public class ClusterController {
 	 */
 	public void launchExperiment(ExperimentPlan experimentPlan,
 			ClusterSpec clusterSpec) throws IOException, InterruptedException {
-		// try {
+
 		Cluster cluster = getClusterStateStore(clusterSpec).load();
 		runExperiment(experimentPlan, clusterSpec, cluster);
 
-		// } catch (Throwable e) {
-		// if (clusterSpec.isTerminateAllOnLaunchFailure()) {
-		// LOG.error(
-		// "Unable to start the experiment. Terminating all nodes.",
-		// e);
-		// destroyCluster(clusterSpec);
-		//
-		// } else {
-		// LOG.error(
-		// "*CRITICAL* the cluster failed to launch and the automated node termination"
-		// + " option was not selected, there might be orphaned nodes.",
-		// e);
-		// }
-		//
-		// throw new RuntimeException(e);
-		// }
 	}
 
 	public void destroyCluster(ClusterSpec clusterSpec, Cluster cluster)
