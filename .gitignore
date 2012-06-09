@@ -7,7 +7,8 @@ target
 *.iml
 **/*.log
 services/voldemort/lib/
-whirr.log
 conf/credentials
 .git
-whirr.log.*services/cassandra/src/test/resources/whirr-cassandra-test.properties
+whirr.log
+whirr.log*
+services/cassandra/src/test/resources/whirr-cassandra-test.properties
