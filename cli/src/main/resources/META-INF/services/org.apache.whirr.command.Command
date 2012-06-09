@@ -21,3 +21,4 @@ org.apache.whirr.cli.command.RunScriptCommand
 org.apache.whirr.cli.command.RunExperimentCommand
 org.apache.whirr.cli.command.VersionCommand
 org.apache.whirr.cli.command.HelpCommand
+org.apache.whirr.cli.command.RepairClusterCommand
