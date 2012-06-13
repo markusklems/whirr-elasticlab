@@ -69,7 +69,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
 				call(getInstallFunction(conf, "java", "install_openjdk")));
 		addStatement(event, call("install_tarball"));
 		addStatement(event, call("install_service"));
-		addStatement(event, call("remove_service"));
+		//addStatement(event, call("remove_service"));
 
 		Configuration config = clusterSpec.getConfiguration();
 
@@ -117,8 +117,8 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
 
 	@Override
 	protected void beforeCleanup(ClusterActionEvent event) {
-		addStatement(event, call("remove_service"));
-		addStatement(event, call("cleanup_cassandra"));
+//		addStatement(event, call("remove_service"));
+//		addStatement(event, call("cleanup_cassandra"));
 	}
 
 	private List<String> getPrivateIps(List<Instance> instances) {

@@ -37,14 +37,14 @@ EOF
   if [[ $# -gt 1 ]]; then
     id=1
     for server in "$@"; do
-      if [ $server == $PRIVATE_IP ]; then
+      if [ "$server" == "$PRIVATE_IP" ]; then
         myid=$id
       fi
       echo "server.$id=$server:2888:3888" >> $config_file
       id=$((id+1))
     done
   
-    if [ -z $myid ]; then
+    if [ -z "$myid" ]; then
       echo "Could not determine id for my host $PRIVATE_IP against servers $@."
       exit 1
     fi

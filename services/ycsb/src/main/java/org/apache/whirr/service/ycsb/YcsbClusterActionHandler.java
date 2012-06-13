@@ -5,6 +5,7 @@ import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,10 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 
 	public static final String YCSB_ROLE = "ycsb";
 	public static final String CASSANDRA_ROLE = "cassandra";
+	public static final String HBASE_MASTER_ROLE = "hbase-master";
+	public static final String HBASE_RS_ROLE = "hbase-regionserver";
+	public static final String HADOOP_DATANODE_ROLE = "hadoop-datanode";
+	public static final String HADOOP_NAMENODE_ROLE = "hadoop-namenode";
 	// public static final int YCSB_PORT = xxx;
 	public static final int HTTP_PORT = 80;
 
@@ -101,18 +106,50 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	@Override
 	protected void beforeConfigure(ClusterActionEvent event)
 			throws IOException, InterruptedException {
-		// Firewall settings
-		event.getFirewallManager().addRule(
-				Rule.create().destination(role(CASSANDRA_ROLE))
-						.ports(HTTP_PORT));
+		Cluster cluster = event.getCluster();
+		Set<Instance> cassandraInstances = cluster
+				.getInstancesMatching(role(CASSANDRA_ROLE));
+		Set<Instance> hbaseInstances = cluster
+		.getInstancesMatching(role(HBASE_MASTER_ROLE));
+		Set<Instance> instances = new HashSet<Instance>();
+		
+		// Firewall settings	
+		if(!cassandraInstances.isEmpty()) {
+			event.getFirewallManager().addRule(
+					Rule.create().destination(role(CASSANDRA_ROLE))
+							.ports(HTTP_PORT));
+		}
+		if(!hbaseInstances.isEmpty()) {
+			event.getFirewallManager().addRule(
+					Rule.create().destination(role(HBASE_MASTER_ROLE))
+							.ports(HTTP_PORT));
+			event.getFirewallManager().addRule(
+					Rule.create().destination(role(HBASE_MASTER_ROLE))
+							.ports(60000));
+			event.getFirewallManager().addRule(
+					Rule.create().destination(role(HBASE_MASTER_ROLE))
+							.ports(2181));
+		}
+		
+			
+		
+//		event.getFirewallManager().addRule(
+//				Rule.create().destination(role(HADOOP_DATANODE_ROLE))
+//						.ports(HTTP_PORT));
+//		event.getFirewallManager().addRule(
+//				Rule.create().destination(role(HADOOP_NAMENODE_ROLE))
+//						.ports(HTTP_PORT));
+//		event.getFirewallManager().addRule(
+//				Rule.create().destination(role(HBASE_RS_ROLE))
+//						.ports(HTTP_PORT));
 
+//		instances.addAll(cluster
+//				.getInstancesMatching(role(HBASE_RS_ROLE)));
+		
 		// Add hosts line to the workload file. The cassandra instances are
 		// started and their ips are known by now.
-		Cluster cluster = event.getCluster();
-		Set<Instance> instances = cluster
-				.getInstancesMatching(role(CASSANDRA_ROLE));
 		List<String> privateIps = getPrivateIps(instances.iterator());
-		String cassandraHosts = Joiner.on(' ').join(privateIps.iterator());
+		String workloadFileHostsParam = Joiner.on(' ').join(privateIps.iterator());
 
 		String repo = event.getClusterSpec().getConfiguration()
 				.getString(WORKLOAD_REPO_GIT, null);
@@ -121,7 +158,7 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		addStatement(event, call("install_git"));
 		addStatement(event, call("update_workload_repo", repo));
 		addStatement(event,
-				call("append_hosts_to_workload_file", cassandraHosts));
+				call("append_hosts_to_workload_file", workloadFileHostsParam));
 	}
 
 	private List<String> getPrivateIps(Iterator<Instance> it) {
