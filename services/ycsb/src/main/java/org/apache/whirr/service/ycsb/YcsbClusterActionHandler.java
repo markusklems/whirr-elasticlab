@@ -91,7 +91,6 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 
 		addStatement(event, call("install_tarball"));
 		addStatement(event, call("install_service"));
-		
 		if (tarball != null && major != null) {
 			// addStatement(event,
 			// call("install_ycsb", major, tarball, db, workload));
@@ -113,8 +112,6 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		Set<Instance> hbaseInstances = cluster
 		.getInstancesMatching(role(HBASE_MASTER_ROLE));
 		Set<Instance> instances = new HashSet<Instance>();
-		instances.addAll(cassandraInstances);
-		instances.addAll(hbaseInstances);
 		
 		// Firewall settings	
 		if(!cassandraInstances.isEmpty()) {
@@ -153,15 +150,13 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		// started and their ips are known by now.
 		List<String> privateIps = getPrivateIps(instances.iterator());
 		String workloadFileHostsParam = Joiner.on(' ').join(privateIps.iterator());
-		addStatement(event, call("install_git"));
+
 		String repo = event.getClusterSpec().getConfiguration()
 				.getString(WORKLOAD_REPO_GIT, null);
 
-		// clone the workload repository
+		// install git and clone the workload repository
+		addStatement(event, call("install_git"));
 		addStatement(event, call("update_workload_repo", repo));
-		addStatement(event,
-				call("prepare_append_hosts_to_workload_file","/usr/local/ycsb-0.1.4/workloads/"+event.getClusterSpec().getConfiguration()
-						.getString(YCSB_WORKLOAD_FILE, null)));
 		addStatement(event,
 				call("append_hosts_to_workload_file", workloadFileHostsParam));
 	}
