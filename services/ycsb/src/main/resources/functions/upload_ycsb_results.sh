@@ -14,35 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+function upload_ycsb_results() {
+cd /usr/local/ycsb-0.1.4/workloads/ && git add -A && git commit -m "new reports" && git push
+}
 
-#
-# List of nodes for the BYON (bring your own nodes) jclouds provider
-#
-
-# Check recipes/zookeeper-byon.properties for Whirr configuration example
-
-# You should update the configuration bellow to match your setup
-
-nodes:
-    - id: ubuntu1
-      hostname: 192.168.54.160
-      os_arch: x86
-#     os_arch: x86_64
-      os_family: ubuntu
-      os_description: ubuntu
-      os_version: 10.04
-      group: whirr
-      username: user
-      credential: xxx
-      sudo_password: xxx
-    - id: ubuntu2
-      hostname: 192.168.54.161
-      os_arch: x86
-      os_family: ubuntu
-      os_description: ubuntu
-      os_version: 10.04
-      group: whirr
-      username: user
-      credential: xxx
-      sudo_password: xxx
-
+upload_ycsb_results

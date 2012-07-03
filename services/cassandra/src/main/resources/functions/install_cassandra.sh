@@ -22,7 +22,7 @@ function install_cassandra() {
   c_tar_file=`basename $C_TAR_URL`
   c_tar_dir=`echo $c_tar_file | awk -F '-bin' '{print $1}'`
   
-  CASSANDRA_HOME=/usr/local/$c_tar_dir
+  CASSANDRA_HOME=/usr/local/cassandra/$c_tar_dir
   C_CONF_DIR=/etc/cassandra/conf
   C_LOG_DIR=/var/log/cassandra
   

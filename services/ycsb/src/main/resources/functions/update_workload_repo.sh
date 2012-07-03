@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 function update_workload_repo() {
-  YCSB_WORKLOAD_REPO=${1:-git://github.com/markusklems/YCSB-workloads.git}
+  YCSB_WORKLOAD_REPO=${1:-git@github.com:markusklems/YCSB-workloads.git}
   #YCSB_WORKLOAD_REPO_VERSION=${2:-HEAD}
   
   # remove the existing workload files

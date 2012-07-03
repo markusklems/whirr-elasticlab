@@ -95,12 +95,12 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
 				Rule.create().destination(instances)
 						.ports(CLIENT_PORT, JMX_PORT));
 
-		setInitialTokensAsEnvironmentVariables(event, instances);
-
-		List<Instance> seeds = getSeeds(instances);
-		String seedServers = Joiner.on(' ').join(getPrivateIps(seeds));
-
-		addStatement(event, call("configure_cassandra", seedServers));
+//		setInitialTokensAsEnvironmentVariables(event, instances);
+//
+//		List<Instance> seeds = getSeeds(instances);
+//		String seedServers = Joiner.on(' ').join(getPrivateIps(seeds));
+//
+//		addStatement(event, call("configure_cassandra", seedServers));
 	}
 
 	@Override
