@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 function append_hosts_to_workload_file() {
-  YCSB_WORKLOAD_FILE=/usr/local/ycsb-0.1.4/workloads/performance/workloada 
+  #YCSB_WORKLOAD_FILE=${1:-/usr/local/ycsb-0.1.4/workloads/performance/workloada }
 
   hosts="hosts="
   for server in "$@"; do

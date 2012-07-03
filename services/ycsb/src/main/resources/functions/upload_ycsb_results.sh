@@ -14,14 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function update_workload_repo() {
-  YCSB_WORKLOAD_REPO=${1:-git@github.com:markusklems/YCSB-workloads.git}
-  #YCSB_WORKLOAD_REPO_VERSION=${2:-HEAD}
-  
-  # remove the existing workload files
-  rm -Rd /usr/local/ycsb-0.1.4/workloads
-  
-  # clone repo from git
-  git clone $YCSB_WORKLOAD_REPO /usr/local/ycsb-0.1.4/workloads
-  
+function upload_ycsb_results() {
+cd /usr/local/ycsb-0.1.4/workloads/ && git add -A && git commit -m "new reports" && git push
 }
