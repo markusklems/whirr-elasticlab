@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.whirr.Cluster;
+import org.apache.whirr.ExperimentParameters;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
@@ -38,27 +39,7 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 
 	public static final String BIN_TARBALL = "whirr.ycsb.tarball.url";
 	public static final String MAJOR_VERSION = "whirr.ycsb.version.major";
-	public static final String WORKLOAD_REPO_GIT = "whir.ycsb.workload.repo.git";
-
-	// runExperiment command options
-	public static final String YCSB_EXPERIMENT_ACTION = "whirr.ycsb-experiment-action";
-	public static final String YCSB_DB = "whirr.ycsb-db";
-	public static final String YCSB_WORKLOAD_FILE = "whirr.ycsb-workload-file";
-
-	public static enum EXPERIMENT_ACTION_VALUE {
-		EXPERIMENT_LOAD("load"), EXPERIMENT_RUN("run"), EXPERIMENT_UPLOAD_DATA(
-				"upload");
-
-		private final String value;
-
-		private EXPERIMENT_ACTION_VALUE(final String val) {
-			this.value = val;
-		}
-
-		public String toString() {
-			return value;
-		}
-	}
+	public static final String WORKLOAD_REPO_GIT = "whirr.ycsb.workload.repo.git";
 
 	@Override
 	public String getRole() {
@@ -91,7 +72,7 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 
 		addStatement(event, call("install_tarball"));
 		addStatement(event, call("install_service"));
-		
+
 		if (tarball != null && major != null) {
 			// addStatement(event,
 			// call("install_ycsb", major, tarball, db, workload));
@@ -107,63 +88,53 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	@Override
 	protected void beforeConfigure(ClusterActionEvent event)
 			throws IOException, InterruptedException {
-		Cluster cluster = event.getCluster();
-		Set<Instance> cassandraInstances = cluster
-				.getInstancesMatching(role(CASSANDRA_ROLE));
-		Set<Instance> hbaseInstances = cluster
-		.getInstancesMatching(role(HBASE_MASTER_ROLE));
-		Set<Instance> instances = new HashSet<Instance>();
-		instances.addAll(cassandraInstances);
-		instances.addAll(hbaseInstances);
-		
-		// Firewall settings	
-		if(!cassandraInstances.isEmpty()) {
-			event.getFirewallManager().addRule(
-					Rule.create().destination(role(CASSANDRA_ROLE))
-							.ports(HTTP_PORT));
-		}
-		if(!hbaseInstances.isEmpty()) {
-			event.getFirewallManager().addRule(
-					Rule.create().destination(role(HBASE_MASTER_ROLE))
-							.ports(HTTP_PORT));
-			event.getFirewallManager().addRule(
-					Rule.create().destination(role(HBASE_MASTER_ROLE))
-							.ports(60000));
-			event.getFirewallManager().addRule(
-					Rule.create().destination(role(HBASE_MASTER_ROLE))
-							.ports(2181));
-		}
-		
-			
-		
-//		event.getFirewallManager().addRule(
-//				Rule.create().destination(role(HADOOP_DATANODE_ROLE))
-//						.ports(HTTP_PORT));
-//		event.getFirewallManager().addRule(
-//				Rule.create().destination(role(HADOOP_NAMENODE_ROLE))
-//						.ports(HTTP_PORT));
-//		event.getFirewallManager().addRule(
-//				Rule.create().destination(role(HBASE_RS_ROLE))
-//						.ports(HTTP_PORT));
-
-//		instances.addAll(cluster
-//				.getInstancesMatching(role(HBASE_RS_ROLE)));
-		
-		// Add hosts line to the workload file. The cassandra instances are
-		// started and their ips are known by now.
-		List<String> privateIps = getPrivateIps(instances.iterator());
-		String workloadFileHostsParam = Joiner.on(' ').join(privateIps.iterator());
 		addStatement(event, call("install_git"));
 		String repo = event.getClusterSpec().getConfiguration()
 				.getString(WORKLOAD_REPO_GIT, null);
 
-		// clone the workload repository
+		// remove and then clone the workload repository
 		addStatement(event, call("update_workload_repo", repo));
-		addStatement(event,
-				call("prepare_append_hosts_to_workload_file","/usr/local/ycsb-0.1.4/workloads/"+event.getClusterSpec().getConfiguration()
-						.getString(YCSB_WORKLOAD_FILE, null)));
-		addStatement(event,
-				call("append_hosts_to_workload_file", workloadFileHostsParam));
+//		addStatement(
+//				event,
+//				call("prepare_append_hosts_to_workload_file",
+//						"/usr/local/ycsb-0.1.4/workloads/"
+//								+ event.getClusterSpec().getConfiguration()
+//										.getString(YCSB_WORKLOAD_FILE, null)));
+//		addStatement(event,
+//				call("append_hosts_to_workload_file", workloadFileHostsParam));
+	}
+
+	private Set<Instance> getInstancesThatMatchTheRoles(Cluster cluster, ClusterActionEvent event) throws IOException {
+		Set<Instance> cassandraInstances = cluster
+				.getInstancesMatching(role(CASSANDRA_ROLE));
+//		Set<Instance> hbaseInstances = cluster
+//				.getInstancesMatching(role(HBASE_MASTER_ROLE));
+		Set<Instance> instances = new HashSet<Instance>();
+		instances.addAll(cassandraInstances);
+//		instances.addAll(hbaseInstances);
+
+		// Firewall settings
+		if (!cassandraInstances.isEmpty()) {
+			event.getFirewallManager().addRule(
+					Rule.create().destination(role(CASSANDRA_ROLE))
+							.ports(HTTP_PORT));
+//			instances
+//					.addAll(cluster.getInstancesMatching(role(CASSANDRA_ROLE)));
+		}
+//		if (!hbaseInstances.isEmpty()) {
+//			event.getFirewallManager().addRule(
+//					Rule.create().destination(role(HBASE_MASTER_ROLE))
+//							.ports(HTTP_PORT));
+//			event.getFirewallManager().addRule(
+//					Rule.create().destination(role(HBASE_MASTER_ROLE))
+//							.ports(60000));
+//			event.getFirewallManager().addRule(
+//					Rule.create().destination(role(HBASE_MASTER_ROLE))
+//							.ports(2181));
+////			instances.addAll(cluster
+////					.getInstancesMatching(role(HBASE_MASTER_ROLE)));
+//		}
+		return instances;
 	}
 
 	private List<String> getPrivateIps(Iterator<Instance> it) {
@@ -178,26 +149,71 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 			throws IOException, InterruptedException {
 		ClusterSpec clusterSpec = event.getClusterSpec();
 		Configuration config = clusterSpec.getConfiguration();
+		Cluster cluster = event.getCluster();
+		Set<Instance> instances = getInstancesThatMatchTheRoles(cluster, event);
+		// Add hosts line to the workload file. The cassandra instances are
+		// started and their ips are known by now.
+		List<String> privateIps = getPrivateIps(instances.iterator());
+	    String workloadFileHostsParam = Joiner.on(' ').join(
+				privateIps.iterator());
 
-		String experimentAction = config.getString(YCSB_EXPERIMENT_ACTION, null);
-		final String db = config.getString(YCSB_DB, null);
-		final String workload = config.getString(YCSB_WORKLOAD_FILE, null);
+		String experimentAction = config
+				.getString(ExperimentParameters.YCSB_EXPERIMENT_ACTION, null);
+		final String db = config.getString(ExperimentParameters.YCSB_DB, null);
+		final String workload = config.getString(ExperimentParameters.YCSB_WORKLOAD_FILE, null);
 		final String major = config.getString(MAJOR_VERSION, null);
-		final String load = EXPERIMENT_ACTION_VALUE.EXPERIMENT_LOAD.toString();
-		final String run = EXPERIMENT_ACTION_VALUE.EXPERIMENT_RUN.toString();
-		final String upload = EXPERIMENT_ACTION_VALUE.EXPERIMENT_UPLOAD_DATA
+		final String phase = config.getString(ExperimentParameters.YCSB_WORKLOAD_PHASE, null);
+		// experiment phase
+		final String load = ExperimentParameters.EXPERIMENT_PHASE_VALUE.EXPERIMENT_PHASE_LOAD.toString();
+		final String transaction = ExperimentParameters.EXPERIMENT_PHASE_VALUE.EXPERIMENT_PHASE_TRANSACTION.toString();
+		// experiment action
+		final String prepare = ExperimentParameters.EXPERIMENT_ACTION_VALUE.EXPERIMENT_PREPARE
+				.toString();
+		final String run = ExperimentParameters.EXPERIMENT_ACTION_VALUE.EXPERIMENT_RUN.toString();
+		final String upload = ExperimentParameters.EXPERIMENT_ACTION_VALUE.EXPERIMENT_UPLOAD_DATA
 				.toString();
 		// add database, e.g., cassandra-10
 		String dbOption = db == null ? "basic" : db;
 		// add path to workload file
-		String workloadOption = getWorkloadFilePath(major,workload);
+		String workloadOption = getWorkloadFilePath(major, workload);
 		// print output into this report file
-		String reportOption = getReportFilePath(major,workload);
+		String reportOption = getReportFilePath(major, workload);
+		
+		String repo = event.getClusterSpec().getConfiguration()
+				.getString(WORKLOAD_REPO_GIT, null);
 
-		if (experimentAction.equalsIgnoreCase(load)) {
-			addStatement(event, call("execute_ycsb", load, dbOption, workloadOption,reportOption+"-load"));
+		if (experimentAction.equalsIgnoreCase(prepare)) {
+			// FIXME ?
+//			addStatement(event,
+//					call("update_workload_repo", repo));
+			addStatement(
+					event,
+					call("prepare",
+							"/usr/local/ycsb-0.1.4/workloads/"
+									+ event.getClusterSpec().getConfiguration()
+											.getString(ExperimentParameters.YCSB_WORKLOAD_FILE, null)));
+			addStatement(event,
+					call("append_hosts_to_workload_file", workloadFileHostsParam));
 		} else if (experimentAction.equalsIgnoreCase(run)) {
-			addStatement(event, call("execute_ycsb", run, dbOption, workloadOption,reportOption));
+			if (phase.equalsIgnoreCase(load)) {
+				addStatement(
+						event,
+						call("execute_ycsb", load, dbOption, workloadOption,
+								reportOption+"-load"));
+			} else if(phase.equalsIgnoreCase(transaction)) {
+				// TODO
+				// collect gossip messages in a log file and write into monitoring directory
+				// every 10 seconds
+				// timestamp -> CLUSTER STATUS
+				//TODO
+				// wait 600 seconds
+				// move A+B parallel, then move C
+				// addStatement("sleep 600; nodetool move nodeA tokenA tptargetA && nodetool move nodeB tokenB tpTargetB; nodetool move nodeC tokenC tpTargetC")
+			addStatement(
+					event,
+					call("execute_ycsb", run, dbOption, workloadOption,
+							reportOption));
+			}
 		} else if (experimentAction.equalsIgnoreCase(upload)) {
 			addStatement(event, call("upload_ycsb_results"));
 		}
@@ -206,13 +222,13 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	private String getReportFilePath(String major, String workload) {
 		StringBuffer toReturn = new StringBuffer();
 		// construct path to ycsb report file for the given workload
-		toReturn.append(getYCSBRootPath(major,workload));
+		toReturn.append(getYCSBRootPath(major, workload));
 		toReturn.append("reports/");
 		if (workload != null) {
 			// could be for example "performance/workloadb"
 			toReturn.append(workload);
 		} else {
-			toReturn.append("workloada");
+			toReturn.append("performance/workloada");
 		}
 		return toReturn.toString();
 	}
@@ -220,12 +236,12 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	private String getWorkloadFilePath(String major, String workload) {
 		StringBuffer toReturn = new StringBuffer();
 		// construct path to ycsb workload file
-		toReturn.append(getYCSBRootPath(major,workload));
+		toReturn.append(getYCSBRootPath(major, workload));
 		if (workload != null) {
 			// could be for example "performance/workloadb"
 			toReturn.append(workload);
 		} else {
-			toReturn.append("workloada");
+			toReturn.append("performance/workloada");
 		}
 		return toReturn.toString();
 	}
@@ -242,7 +258,7 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	@Override
 	protected void afterRunExperiment(ClusterActionEvent event)
 			throws IOException, InterruptedException {
-		// upload ycsb measurements to github (doesnt work -> why?)
+		// upload ycsb measurements to github?
 	}
 
 	// @Override

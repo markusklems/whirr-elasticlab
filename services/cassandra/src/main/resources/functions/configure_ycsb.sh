@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 function configure_ycsb() {
-  #TODO ping cassandra status to see when it is running or time-out after 60 sec
-  sleep 60
+  echo 'export PATH=${1:-apache-cassandra-1.0}/bin:$PATH' >> /etc/profile
+  source /etc/profile
 
   CREATE_TABLE_STATEMENTS=/usr/local/create_usertable
 
@@ -26,5 +26,5 @@ use usertable;
 create column family data with comparator='AsciiType';
 END_OF_FILE
   
-  /usr/local/apache-cassandra-1.1.0/bin/cassandra-cli -f $CREATE_TABLE_STATEMENTS
+  cassandra-cli -f $CREATE_TABLE_STATEMENTS
 }

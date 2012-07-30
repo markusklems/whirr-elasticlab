@@ -29,7 +29,8 @@ whirr.cluster-name=ycsb-cassandra-cluster
 # to ~/.whirr/credentials and editing as needed
 
 # Change the name of cluster admin user
-whirr.cluster-user=${sys:user.name}
+#whirr.cluster-user=${sys:user.name}
+whirr.cluster-user=markus
 
 # YCSB configs
 whirr.ycsb.tarball.url=https://github.com/downloads/markusklems/YCSBX/ycsb-0.1.4.tar.gz

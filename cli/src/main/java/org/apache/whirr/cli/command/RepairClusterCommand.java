@@ -51,12 +51,10 @@ import org.apache.whirr.service.cassandra.CassandraClusterActionHandler;
 import org.apache.whirr.service.cassandra.CassandraHelper;
 import org.apache.whirr.service.ganglia.GangliaMonitorClusterActionHandler;
 import org.apache.whirr.service.ganglia.GangliaMonitorHelper;
-import org.apache.whirr.service.hbase.HBaseMasterClusterActionHandler;
-import org.apache.whirr.service.hbase.HBaseMasterHelper;
-import org.apache.whirr.service.hbase.HBaseRegionServerClusterActionHandler;
-import org.apache.whirr.service.hbase.HBaseRegionServerHelper;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
+import org.apache.whirr.service.ycsb.YcsbClusterActionHandler;
+import org.apache.whirr.service.ycsb.YcsbHelper;
 import org.apache.whirr.service.zookeeper.ZkHelper;
 import org.apache.whirr.service.zookeeper.ZooKeeperClusterActionHandler;
 import org.apache.whirr.state.ClusterStateStore;
@@ -197,6 +195,12 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 				 */
 				StatementBuilder builder = new StatementBuilder();
 				if (ROLES
+						.contains(YcsbClusterActionHandler.YCSB_ROLE)) {
+					YcsbHelper ycsbHelper = new YcsbHelper();
+					for (Statement s : ycsbHelper.getStatements(spec))
+						builder.addStatement(s);
+				}
+				if (ROLES
 						.contains(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE)) {
 					ZkHelper zkHelper = new ZkHelper();
 					for (Statement s : zkHelper.getStatements(spec))
@@ -214,18 +218,18 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 					for (Statement s : cassHelper.getStatements(spec))
 						builder.addStatement(s);
 				}
-				if (ROLES
-						.contains(HBaseMasterClusterActionHandler.ROLE)) {
-					HBaseMasterHelper hmHelper = new HBaseMasterHelper();
-					for (Statement s : hmHelper.getStatements(spec))
-						builder.addStatement(s);
-				}
-				if (ROLES
-						.contains(HBaseRegionServerClusterActionHandler.ROLE)) {
-					HBaseRegionServerHelper hrsHelper = new HBaseRegionServerHelper();
-					for (Statement s : hrsHelper.getStatements(spec))
-						builder.addStatement(s);
-				}
+//				if (ROLES
+//						.contains(HBaseMasterClusterActionHandler.ROLE)) {
+//					HBaseMasterHelper hmHelper = new HBaseMasterHelper();
+//					for (Statement s : hmHelper.getStatements(spec))
+//						builder.addStatement(s);
+//				}
+//				if (ROLES
+//						.contains(HBaseRegionServerClusterActionHandler.ROLE)) {
+//					HBaseRegionServerHelper hrsHelper = new HBaseRegionServerHelper();
+//					for (Statement s : hrsHelper.getStatements(spec))
+//						builder.addStatement(s);
+//				}
 				
 				// stop the services
 				controller.stopServices(spec);

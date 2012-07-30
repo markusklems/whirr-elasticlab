@@ -14,14 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-function upload_ycsb_results() {
-  cd /usr/local/ycsb-0.1.4/workloads/
-  git add -A
-  git commit -m "new reports"
-  git push
+function prepare_append_hosts_to_workload_file() {
+  YCSB_WORKLOAD_FILE=${1:-/usr/local/ycsb-0.1.4/workloads/performance/workloada }
   
-  #git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" add /usr/local/ycsb-0.1.4/workloads/reports/*
-  #git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" commit -m "new reports"
-  #git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" push
+    # search if the line "YCSB_WORKLOAD_FILE=..." already exists in file
+  if grep -Fq "YCSB_WORKLOAD_FILE=" /etc/profile"
+  then
+      echo "Reset YCSB_WORKLOAD_FILE."
+      sed -i 's/YCSB_WORKLOAD_FILE=.*/YCSB_WORKLOAD_FILE='$YCSB_WORKLOAD_FILE'/g' /etc/profile
+  else
+    echo "Set YCSB_WORKLOAD_FILE."
+    echo "export YCSB_WORKLOAD_FILE=$YCSB_WORKLOAD_FILE" >> /etc/profile
+  fi
+  
+  source /etc/profile
 }

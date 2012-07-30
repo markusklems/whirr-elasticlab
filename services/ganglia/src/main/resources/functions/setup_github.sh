@@ -14,21 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function install_ycsb() {
-
-  Y_MAJOR_VERSION=${1:-0.1.4}
-  Y_TAR_URL=${2:-https://github.com/downloads/brianfrankcooper/YCSB/ycsb-0.1.4.tar.gz}
- 
-  y_tar_file=`basename $Y_TAR_URL`
-  y_tar_dir=`echo $y_tar_file | awk -F '.tar.gz' '{print $1}'`
-  
-  YCSB_HOME=/usr/local/$y_tar_dir
-  
-  install_tarball_no_md5 $Y_TAR_URL
- 
-  echo "export YCSB_HOME=$YCSB_HOME" >> /etc/profile
-  echo 'export PATH=$YCSB_HOME/bin:$PATH' >> /etc/profile 
-  source /etc/profile
+function setup_github() {
   
   # pk for github
 
@@ -99,7 +85,7 @@ END_OF_FILE
   
   # github ssh settings
   echo -e "Host github.com\n\tStrictHostKeyChecking no\n\tIdentityFile /home/users/markus/.ssh/git_id\n" >> /home/users/markus/.ssh/config
-  echo -e "Host github.com\n\tStrictHostKeyChecking no\n\tIdentityFile /root/.ssh/git_id\n" >> /root/.ssh/config
+  echo -e "Host github.com\n\tStrictHostKeyChecking no\n\tIdentityFile /home/users/markus/.ssh/git_id\n" >> /root/.ssh/config
   
 
 }

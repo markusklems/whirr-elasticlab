@@ -14,15 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function setup_ganglia_monitor() {
-  YCSB_WORKLOAD_FILE=/usr/local/ycsb-0.1.4/workloads/performance/workloada 
-
-  hosts="hosts="
-  for server in "$@"; do
-    hosts="${hosts}${server},"
-  done
-  #remove last comma
-  hosts=${hosts%?}
-  # add a blank line and then the hosts line
-  echo >> "$YCSB_WORKLOAD_FILE"; echo "$hosts" >> "$YCSB_WORKLOAD_FILE"
+function save_start_time() {
+  rm /usr/local/start_time
+  TIME=$(date +%s)
+  echo "$TIME" >> /usr/local/start_time
 }

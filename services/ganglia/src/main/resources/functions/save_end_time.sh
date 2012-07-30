@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function upload_ycsb_results() {
-cd /usr/local/ycsb-0.1.4/workloads/ && git pull && git add -A && git commit -m "new benchmarking data" && git push
+function save_end_time() {
+  rm /usr/local/end_time
+  TIME=$(date +%s)
+  echo "$TIME" >> /usr/local/end_time
 }

@@ -29,13 +29,14 @@ whirr.cluster-name=ycsb-cassandra-cluster
 # to ~/.whirr/credentials and editing as needed
 
 # Change the name of cluster admin user
-whirr.cluster-user=${sys:user.name}
+#whirr.cluster-user=${sys:user.name}
+whirr.cluster-user=markus
 
 # YCSB configs
 whirr.ycsb.tarball.url=https://github.com/downloads/markusklems/YCSBX/ycsb-0.1.4.tar.gz
 whirr.ycsb.version.major=0.1.4
 whirr.ycsb-db=cassandra-10
-whirr.ycsb-workload-file=scale/workloada-03nodes
+whirr.ycsb-workload-file=scale/workloada-07nodes
 whirr.ycsb-experiment-action=prepare
 whirr.ycsb.workload.repo.git=git@github.com:markusklems/YCSB-workloads.git
 
@@ -44,7 +45,7 @@ whirr.cassandra.version.major=1.1.0
 whirr.cassandra.tarball.url=http://apache.mirror.iphh.net/cassandra/1.1.2/apache-cassandra-1.1.2-bin.tar.gz
 
 # Change the number of machines in the cluster here
-whirr.instance-templates=1 ycsb, 3 cassandra+ganglia-monitor, 1 ganglia-metad
+whirr.instance-templates=1 ycsb, 7 cassandra+ganglia-monitor, 1 ganglia-metad
 whirr.provider=aws-ec2
 whirr.identity=${env:AWS_ACCESS_KEY_ID} 
 whirr.credential=${env:AWS_SECRET_ACCESS_KEY}

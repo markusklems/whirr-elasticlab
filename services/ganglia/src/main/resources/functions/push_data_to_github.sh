@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function prepare_append_hosts_to_workload_file() {
-  YCSB_WORKLOAD_FILE=${1:-/usr/local/ycsb-0.1.4/workloads/performance/workloada }
-  echo "export YCSB_WORKLOAD_FILE=$YCSB_WORKLOAD_FILE" >> /etc/profile
-  source /etc/profile
+function push_data_to_github() {
+cd /usr/local/ycsb-0.1.4/workloads/ && git pull && git add -A && git commit -m "new monitoring data" && git push
 }
