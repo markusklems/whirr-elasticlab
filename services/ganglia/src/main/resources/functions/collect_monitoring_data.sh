@@ -15,18 +15,18 @@
 # limitations under the License.
 #
 function collect_monitoring_data() {
-  echo "start collecting monitoring data"
-  #rm -Rd $1
-  mkdir $1
-  echo "created directory $1"
+  MONITORING_DATA_DIR=${1:-/usr/local/monitoring-data}
+  WORKLOAD=${2:-workloada}
+  FULL_MONITORING_DATA_DIR_PATH="$MONITORING_DATA_DIR/$WORKLOAD"
+  echo "start collecting monitoring data and store it in $MONITORING_DATA_DIR"
   start=`cat /usr/local/start_time`
   end=`cat /usr/local/end_time`
   echo "time between $start and $end"
-  CLUSTER="/var/lib/ganglia/rrds/${2:-ycsb-cassandra-cluster}/*"
+  CLUSTER="/var/lib/ganglia/rrds/${3:-ycsb-cassandra-cluster}/*"
   for server in $CLUSTER
   do
       server_name=`echo "$server" | awk -F"/" '{print $NF}'`
-      server_dir="${1:-/usr/local/ycsb-0.1.4/workloads/reports/monitoring/}$server_name/"
+      server_dir="$FULL_MONITORING_DATA_DIR_PATH/$server_name/"
       mkdir $server_dir
       SERVER="$server/*"
       echo "processing directory $SERVER"

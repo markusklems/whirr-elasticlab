@@ -83,8 +83,10 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 			.getLogger(RepairClusterCommand.class);
 	public static String REPAIR_ACTION = "repair";
 	public static List<String> ROLES = new ArrayList<String>();
-	public static final String REPAIR_ROLES ="repair-roles";
-	public final static String WHIRR_REPAIR_ROLES = "whirr."+REPAIR_ROLES;
+	public static final String REPAIR_ROLES = "repair-roles";
+	public static final String REPAIR_ONLINE = "repair-online";
+	public final static String WHIRR_REPAIR_ROLES = "whirr." + REPAIR_ROLES;
+	public final static String WHIRR_REPAIR_ONLINE = "whirr." + REPAIR_ONLINE;
 
 	public RepairClusterCommand() {
 		super(REPAIR_ACTION + "-cluster", "Repair a running cluster by "
@@ -98,6 +100,7 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 	public int run(InputStream in, PrintStream out, PrintStream err,
 			List<String> args) throws Exception {
 		parser.accepts(REPAIR_ROLES);
+		parser.accepts(REPAIR_ONLINE);
 		OptionSet optionSet = parser.parse(args.toArray(new String[0]));
 
 		try {
@@ -109,8 +112,10 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 			Configuration config = spec.getConfiguration();
 			// read roles from command line "--repair-roles=xyz" (or from the
 			// properties file)
-			String repairRoles = config.getString(WHIRR_REPAIR_ROLES, null); //(String) optionSet.valueOf(REPAIR_ROLES); TODO 
-			LOG.info("Repair roles: "+repairRoles);
+			String repairRoles = config.getString(WHIRR_REPAIR_ROLES, null); // (String)
+																				// optionSet.valueOf(REPAIR_ROLES);
+																				// TODO
+			LOG.info("Repair roles: " + repairRoles);
 			for (String role : repairRoles.split(" ")) {
 				ROLES.add(role);
 			}
@@ -194,8 +199,7 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 				 * phase
 				 */
 				StatementBuilder builder = new StatementBuilder();
-				if (ROLES
-						.contains(YcsbClusterActionHandler.YCSB_ROLE)) {
+				if (ROLES.contains(YcsbClusterActionHandler.YCSB_ROLE)) {
 					YcsbHelper ycsbHelper = new YcsbHelper();
 					for (Statement s : ycsbHelper.getStatements(spec))
 						builder.addStatement(s);
@@ -218,21 +222,28 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 					for (Statement s : cassHelper.getStatements(spec))
 						builder.addStatement(s);
 				}
-//				if (ROLES
-//						.contains(HBaseMasterClusterActionHandler.ROLE)) {
-//					HBaseMasterHelper hmHelper = new HBaseMasterHelper();
-//					for (Statement s : hmHelper.getStatements(spec))
-//						builder.addStatement(s);
-//				}
-//				if (ROLES
-//						.contains(HBaseRegionServerClusterActionHandler.ROLE)) {
-//					HBaseRegionServerHelper hrsHelper = new HBaseRegionServerHelper();
-//					for (Statement s : hrsHelper.getStatements(spec))
-//						builder.addStatement(s);
-//				}
-				
-				// stop the services
-				controller.stopServices(spec);
+				// if (ROLES
+				// .contains(HBaseMasterClusterActionHandler.ROLE)) {
+				// HBaseMasterHelper hmHelper = new HBaseMasterHelper();
+				// for (Statement s : hmHelper.getStatements(spec))
+				// builder.addStatement(s);
+				// }
+				// if (ROLES
+				// .contains(HBaseRegionServerClusterActionHandler.ROLE)) {
+				// HBaseRegionServerHelper hrsHelper = new
+				// HBaseRegionServerHelper();
+				// for (Statement s : hrsHelper.getStatements(spec))
+				// builder.addStatement(s);
+				// }
+
+				String repairOnlineString = config.getString(
+						WHIRR_REPAIR_ONLINE, "false");
+				Boolean repairOnline = new Boolean(repairOnlineString);
+
+				if (!repairOnline) {
+					// stop the services
+					controller.stopServices(spec);
+				}
 
 				// build and bootstrap new nodes
 				final Set<? extends NodeMetadata> newNodes = (new StartupProcess(
@@ -250,21 +261,19 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 				cluster.getInstances().addAll(
 						getInstances(Sets.newHashSet(ROLES), newNodes));
 				stateStore.save(cluster);
-				/*
-				 * The easy way (with small downtime) - stop all zookeeper nodes
-				 * - reconfigure and start
-				 */
-				
+
 				// re-configure the cluster and start services
 				controller.configureServices(spec);
-				controller.startServices(spec);
+				if (!repairOnline) {
+					controller.startServices(spec);
+				}
 			}
 
 			if (SUPERFLUOUS) {
 				/**
 				 * 0. destroy the superfluous instances
 				 */
-				
+
 				// Stop all nodes
 				controller.stopServices(spec);
 
@@ -296,7 +305,7 @@ public class RepairClusterCommand extends AbstractClusterCommand {
 				 * The easy way (with small downtime) - stop all zookeeper nodes
 				 * - reconfigure and start
 				 */
-				
+
 				// Re-configure and start the services
 				controller.configureServices(spec);
 				controller.startServices(spec);

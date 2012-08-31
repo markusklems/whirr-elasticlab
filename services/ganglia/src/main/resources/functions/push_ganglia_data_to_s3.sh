@@ -14,6 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function upload_ycsb_results() {
-cd /usr/local/ycsb-0.1.4/workloads/ && git pull && git add -A && git commit -m "new benchmarking data" && git push
+function push_ganglia_data_to_s3() {
+  MY_BUCKET=${1:-my-test-bucket-xyz1230987}
+  MONITORING_DATA_DIR=${2:-/usr/local/monitoring-data}
+  # make bucket
+  s3cmd mb "s3://$MY_BUCKET"
+  # put data in bucket
+  s3cmd put --recursive "$MONITORING_DATA_DIR" "s3://$MY_BUCKET/"
 }

@@ -15,11 +15,11 @@
 # limitations under the License.
 #
 function append_hosts_to_workload_file() {
-  #YCSB_WORKLOAD_FILE=${1:-/usr/local/ycsb-0.1.4/workloads/performance/workloada }
+  YCSB_WORKLOAD_FILE_PATH="$ENV_YCSB_WORKLOAD_FILE_PATH"
 
   servers=""
   for server in "$@"; do
-    servers="${server},"
+    servers="${servers}${server},"
   done
   #remove last comma
   servers=${servers%?}
@@ -29,12 +29,12 @@ function append_hosts_to_workload_file() {
   # -q: silent search
 
   # search if the line "hosts=..." already exists in file
-  if grep -Fq "hosts=" "$YCSB_WORKLOAD_FILE"
+  if grep -Fq "hosts=" "$YCSB_WORKLOAD_FILE_PATH"
   then
-      echo "hosts line already exists in workload file, replace the old line with a new line."
-      sed -i 's/hosts=.*/hosts='$servers'/g' "$YCSB_WORKLOAD_FILE"  
+      echo "hosts line already exists in workload file $YCSB_WORKLOAD_FILE_PATH, replace the old line with a new line."
+      sed -i 's/hosts=.*/hosts='$servers'/g' "$YCSB_WORKLOAD_FILE_PATH"  
   else
-    echo "hosts line not found in workload file. Write a new line."
-    echo "hosts=$servers" >> "$YCSB_WORKLOAD_FILE"
+    echo "hosts line not found in workload file $YCSB_WORKLOAD_FILE_PATH. Write a new line with hosts=$servers."
+    echo "hosts=$servers" >> "$YCSB_WORKLOAD_FILE_PATH"
   fi
 }

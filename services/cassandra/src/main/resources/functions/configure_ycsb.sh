@@ -21,7 +21,7 @@ function configure_ycsb() {
   CREATE_TABLE_STATEMENTS=/usr/local/create_usertable
 
   cat >$CREATE_TABLE_STATEMENTS <<END_OF_FILE
-create keyspace usertable with strategy_options = [{replication_factor:3}] and placement_strategy = 'org.apache.cassandra.locator.SimpleStrategy';
+create keyspace usertable with strategy_options = [{replication_factor:1}] and placement_strategy = 'org.apache.cassandra.locator.SimpleStrategy';
 use usertable;
 create column family data with comparator='AsciiType';
 END_OF_FILE

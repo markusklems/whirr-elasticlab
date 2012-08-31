@@ -1,0 +1,31 @@
+whirr.cluster-name=elmar-ycsb-cassandra-cluster
+whirr.cluster-user=markus
+
+# YCSB configs
+whirr.ycsb.tarball.url=https://github.com/downloads/markusklems/YCSBX/ycsb-0.1.4.tar.gz
+whirr.ycsb.version.major=0.1.4
+whirr.ycsb-db=cassandra-10
+whirr.ycsb-workload-file=workloada
+whirr.ycsb-experiment-action=prepare
+whirr.ycsb.workload.repo.git=git://github.com/markusklems/YCSB-workloads.git
+
+# Cassandra configs
+whirr.cassandra.version.major=1.1.0
+whirr.cassandra.tarball.url=http://apache.mirror.iphh.net/cassandra/1.1.2/apache-cassandra-1.1.2-bin.tar.gz
+
+# Change the number of machines in the cluster here
+whirr.instance-templates=1 ycsb, 3 cassandra+ganglia-monitor, 1 ganglia-metad
+whirr.provider=aws-ec2
+whirr.identity=${env:AWS_ACCESS_KEY_ID} 
+whirr.credential=${env:AWS_SECRET_ACCESS_KEY}
+whirr.private-key-file=${sys:user.home}/.ssh/whirr_git_rsa
+whirr.public-key-file=${sys:user.home}/.ssh/whirr_git_rsa.pub
+
+# repair configs
+whirr.repair-roles=cassandra ganglia-monitor
+
+# jclouds and ssh connection settings
+jclouds.compute.timeout.node-terminated=12000000
+jclouds.compute.timeout.node-running=36000000
+jclouds.compute.timeout.script-complete=120000000
+jclouds.compute.timeout.port-open=12000000

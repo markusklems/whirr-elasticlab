@@ -14,15 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function clone_experiment_repo() {
-  # the read-only link to the experiment repo on github
-  REMOTE_EXPERIMENT_REPO=${1:-git://github.com/markusklems/Experiments.git}
-  EXPERIMENT_DIR=${2:-/usr/local/experiments}
-  
-  # remove the existing experiment files (potentially from a previous experiment run)
-  rm -Rd "$EXPERIMENT_DIR"
-  
-  # clone repo from git in read-only mode
-  git clone "$REMOTE_EXPERIMENT_REPO" "$EXPERIMENT_DIR"
-  
+function push_ycsb_data_to_s3() {
+  MY_BUCKET=${1:-this-must-be-a-unique-bucket}
+  BENCHMARKING_DATA_DIR=${2:-/usr/local/benchmarking-data}
+  # make bucket
+  s3cmd mb s3://$MY_BUCKET
+  # put data in bucket
+  s3cmd put --recursive $BENCHMARKING_DATA_DIR s3://$MY_BUCKET/
 }

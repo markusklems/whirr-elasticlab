@@ -14,18 +14,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function prepare_append_hosts_to_workload_file() {
-  YCSB_WORKLOAD_FILE=${1:-/usr/local/ycsb-0.1.4/workloads/performance/workloada }
+function prepare_ycsb() {
+  # this is the experiment base directory
+  EXPERIMENT_DIR=${1:-/usr/local/experiments}
+  # the relative workload file path
+  WORKLOAD_FILE=${2:-workloada}
+  # this is the workload file path
+  YCSB_WORKLOAD_FILE_PATH="$EXPERIMENT_DIR/$WORKLOAD_FILE"  
+  # and this is where we store the benchmarking results locally
+  BENCHMARK_BASE_DIR=${3:-/usr/local/benchmarking-data}
+  BENCHMARK_DIR=`dirname "$BENCHMARK_BASE_DIR/$WORKLOAD_FILE"`
+
+  # create directory for benchmarking data
+  mkdir -p "$BENCHMARK_DIR" && echo "created $BENCHMARK_DIR"
+
+  # set the environment variables
+  cp /etc/profile-copy /etc/profile
+  echo "export ENV_YCSB_WORKLOAD_FILE_PATH=$YCSB_WORKLOAD_FILE_PATH" >> /etc/profile
+  echo "export env variable: ENV_YCSB_WORKLOAD_FILE_PATH=$YCSB_WORKLOAD_FILE_PATH"
+  #echo "export ENV_BENCHMARK_DIR=$BENCHMARK_DIR" >> /etc/profile
+  #echo "export env variable: ENV_BENCHMARK_DIR=$BENCHMARK_DIR"
+  #echo "export ENV_EXPERIMENT_DIR=$EXPERIMENT_DIR" >> /etc/profile
+  #echo "export env variable: ENV_EXPERIMENT_DIR=$EXPERIMENT_DIR"
   
-    # search if the line "YCSB_WORKLOAD_FILE=..." already exists in file
-  if grep -Fq "YCSB_WORKLOAD_FILE=" /etc/profile"
-  then
-      echo "Reset YCSB_WORKLOAD_FILE."
-      sed -i 's/YCSB_WORKLOAD_FILE=.*/YCSB_WORKLOAD_FILE='$YCSB_WORKLOAD_FILE'/g' /etc/profile
-  else
-    echo "Set YCSB_WORKLOAD_FILE."
-    echo "export YCSB_WORKLOAD_FILE=$YCSB_WORKLOAD_FILE" >> /etc/profile
-  fi
-  
+  # now source the file to refresh the shell with the new env variables
   source /etc/profile
 }

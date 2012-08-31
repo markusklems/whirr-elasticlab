@@ -29,7 +29,7 @@ public class YcsbHelper extends YcsbClusterActionHandler {
 		}
 		
 		toReturn.add(call("install_git"));
-		String repo = conf.getString(WORKLOAD_REPO_GIT, null);
+		String repo = conf.getString(EXPERIMENT_REPO, null);
 		// clone the workload repository
 		toReturn.add(call("update_workload_repo", repo));
 

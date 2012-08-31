@@ -53,7 +53,15 @@ public class GangliaMetadClusterActionHandler extends
 
 	// Experiment parameters
 	public static final String MAJOR_VERSION = "whirr.ycsb.version.major";
-	public static final String WORKLOAD_REPO_GIT = "whirr.ycsb.workload.repo.git";
+	public static final String WORKLOAD_REPO_GIT = "whirr.ycsb.experiment.repo.git";
+	public static final String OBSERVATION_DATASTORE = "whirr.ycsb.observations.s3.bucket";
+
+	// Cloud credentials
+	public static final String ACCESS_KEY = "whirr.identity";
+	public static final String SECRET_KEY = "whirr.credential";
+	
+	// FIXME should be a whirr variable
+	public static final String MONITORING_DATA_DIR="/usr/local/monitoring-data";
 
 	@Override
 	public String getRole() {
@@ -82,12 +90,16 @@ public class GangliaMetadClusterActionHandler extends
 
 		addStatement(event,
 				call(getInstallFunction(config), "-r", GANGLIA_METAD_ROLE));
+		
+		final String aws_key = config.getString(ACCESS_KEY, null);
+		final String aws_secret = config.getString(SECRET_KEY, null);
+		
+		addStatement(event, call("install_s3cmd",aws_key,aws_secret));
 	}
 
 	@Override
 	protected void beforeConfigure(ClusterActionEvent event)
 			throws IOException, InterruptedException {
-		ClusterSpec clusterSpec = event.getClusterSpec();
 		Cluster cluster = event.getCluster();
 
 		// FIXME: the ganglia port is only opened so the ganglia xml dump can be
@@ -95,7 +107,7 @@ public class GangliaMetadClusterActionHandler extends
 		event.getFirewallManager().addRule(
 				Rule.create().destination(role(GANGLIA_METAD_ROLE))
 						.ports(HTTP_PORT, GANGLIA_META_PORT));
-
+		ClusterSpec clusterSpec = event.getClusterSpec();
 		Configuration config = getConfiguration(clusterSpec);
 		String configureFunction = getConfigureFunction(config);
 
@@ -104,14 +116,14 @@ public class GangliaMetadClusterActionHandler extends
 				.getInstanceMatching(role(GANGLIA_METAD_ROLE)).getPrivateIp();
 		addStatement(event, call(configureFunction, "-m", metadHost));
 
-		// clone experiment github repo
-		addStatement(event, call("install_git"));
-		String repo = event.getClusterSpec().getConfiguration()
-				.getString(WORKLOAD_REPO_GIT, null);
-
-		// clone the workload repository
-		addStatement(event, call("setup_github"));
-		addStatement(event, call("update_workload_repo", repo));
+//		// clone experiment github repo
+//		addStatement(event, call("install_git"));
+//		String repo = event.getClusterSpec().getConfiguration()
+//				.getString(WORKLOAD_REPO_GIT, null);
+//
+//		// clone the workload repository
+//		addStatement(event, call("setup_github"));
+//		addStatement(event, call("update_workload_repo", repo));
 	}
 
 	@Override
@@ -152,7 +164,18 @@ public class GangliaMetadClusterActionHandler extends
 		
 
 		if (experimentAction.equalsIgnoreCase(prepare)) {
-			// do nothing
+			// create monitoring data directory structure
+			if (phase.equalsIgnoreCase(load)) {
+				final String monitoringDir = MONITORING_DATA_DIR;
+				final String workloadPath = workload + "-" + "load";
+				addStatement(event,
+						call("prepare_monitoring", monitoringDir, workloadPath));
+			} else if (phase.equalsIgnoreCase(transaction)) {
+				final String monitoringDir = MONITORING_DATA_DIR;
+				final String workloadPath = workload;
+				addStatement(event,
+						call("prepare_monitoring", monitoringDir, workloadPath));
+			}
 		} else if (experimentAction.equalsIgnoreCase(run)) {
 			// record start time
 			addStatement(event, call("save_start_time"));
@@ -162,14 +185,19 @@ public class GangliaMetadClusterActionHandler extends
 	    // TODO: this used to create a race condition because ycsb also pushes using the "upload" method. This is not a great solution but it works for small numbers of "observer" services.
 		} else if (experimentAction.equalsIgnoreCase(uploadmonitoring)) {
 			if (phase.equalsIgnoreCase(load)) {
-				final String monitoringDirOption = getMonitoringDataDirectoryPath(major, workload+"-load");
-				addStatement(event, call("collect_monitoring_data",monitoringDirOption,"ycsb-cassandra-cluster"));
+				final String monitoringDir = MONITORING_DATA_DIR;
+				final String workloadPath = workload+"-"+"load";
+				addStatement(event, call("collect_monitoring_data",monitoringDir,workloadPath,"ycsb-cassandra-cluster"));
 			}
 			else if(phase.equalsIgnoreCase(transaction)) {
-				final String monitoringDirOption = getMonitoringDataDirectoryPath(major, workload);
-				addStatement(event, call("collect_monitoring_data",monitoringDirOption,"ycsb-cassandra-cluster"));
+				final String monitoringDir = MONITORING_DATA_DIR;
+				final String workloadPath = workload;
+				addStatement(event, call("collect_monitoring_data",monitoringDir,workloadPath,"ycsb-cassandra-cluster"));
 			}
-			addStatement(event, call("push_data_to_github"));
+			String s3_bucket = config.getString(OBSERVATION_DATASTORE,null);	
+			final String monitoringDir = MONITORING_DATA_DIR;
+			addStatement(event, call("push_ycsb_data_to_s3",s3_bucket,monitoringDir));
+			//addStatement(event, call("push_ganglia_data_to_s3",S3_MONITORING_DATA_BUCKET,MONITORING_DATA_DIR));
 		}
 	}	@Override
 	protected void afterRunExperiment(ClusterActionEvent event)

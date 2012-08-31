@@ -37,7 +37,7 @@
   <inceptionYear>2010</inceptionYear>
 
   <modules>
-    <module>build-tools</module>
+    <module>build-tools</module>  
     <module>cli</module>
     <module>core</module>
     <module>examples</module>
@@ -48,7 +48,6 @@
     <module>services/elasticsearch</module>
         
 <!--
-
     <module>services/hadoop</module>
     <module>services/yarn</module>
     <module>services/cdh</module>

@@ -14,6 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function push_data_to_github() {
-cd /usr/local/ycsb-0.1.4/workloads/ && git pull && git add -A && git commit -m "new monitoring data" && git push
+function prepare_monitoring() {
+  MONITORING_DATA_DIR=${1:-/usr/local/monitoring-data}
+  WORKLOAD=${2:-workloada}
+  
+  #rm -Rd "$MONITORING_DATA_DIR" && echo "removed directory $MONITORING_DATA_DIR and content"
+  mkdir "$MONITORING_DATA_DIR" && echo "created directory $MONITORING_DATA_DIR"
+  mkdir -p "$MONITORING_DATA_DIR/$WORKLOAD" && echo "created directory $MONITORING_DATA_DIR/$WORKLOAD"
 }

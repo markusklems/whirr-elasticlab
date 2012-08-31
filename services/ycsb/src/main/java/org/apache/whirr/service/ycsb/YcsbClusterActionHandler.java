@@ -39,7 +39,16 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 
 	public static final String BIN_TARBALL = "whirr.ycsb.tarball.url";
 	public static final String MAJOR_VERSION = "whirr.ycsb.version.major";
-	public static final String WORKLOAD_REPO_GIT = "whirr.ycsb.workload.repo.git";
+	public static final String EXPERIMENT_REPO = "whirr.ycsb.experiment.repo.git";
+	public static final String OBSERVATION_DATASTORE = "whirr.ycsb.observations.s3.bucket";
+	
+	// Cloud credentials
+	public static final String ACCESS_KEY = "whirr.identity";
+	public static final String SECRET_KEY = "whirr.credential";
+	
+	// FIXME should be a whirr variables
+	public static final String LOCAL_EXPERIMENT_DIR = "/usr/local/experiments";
+	public static final String BENCHMARKING_DATA_DIR="/usr/local/benchmarking-data";
 
 	@Override
 	public String getRole() {
@@ -62,24 +71,22 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		addStatement(event,
 				call(getInstallFunction(config, "java", "install_openjdk")));
 		addStatement(event, call("install_tarball_no_md5"));
-
-		// addStatement(event, call("install_service"));
-		// addStatement(event, call("remove_service"));
-
 		String tarball = prepareRemoteFileUrl(event,
 				config.getString(BIN_TARBALL, null));
 		String major = config.getString(MAJOR_VERSION, null);
-
 		addStatement(event, call("install_tarball"));
 		addStatement(event, call("install_service"));
 
 		if (tarball != null && major != null) {
-			// addStatement(event,
-			// call("install_ycsb", major, tarball, db, workload));
 			addStatement(event, call("install_ycsb", major, tarball));
 		} else {
 			addStatement(event, call("install_ycsb"));
 		}
+		addStatement(event, call("install_git"));
+		
+		final String aws_key = config.getString(ACCESS_KEY, null);
+		final String aws_secret = config.getString(SECRET_KEY, null);
+		addStatement(event, call("install_s3cmd",aws_key,aws_secret));
 	}
 
 	/**
@@ -88,20 +95,12 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	@Override
 	protected void beforeConfigure(ClusterActionEvent event)
 			throws IOException, InterruptedException {
-		addStatement(event, call("install_git"));
+//		addStatement(event, call("install_git"));
 		String repo = event.getClusterSpec().getConfiguration()
-				.getString(WORKLOAD_REPO_GIT, null);
+				.getString(EXPERIMENT_REPO, null);
 
 		// remove and then clone the workload repository
-		addStatement(event, call("update_workload_repo", repo));
-//		addStatement(
-//				event,
-//				call("prepare_append_hosts_to_workload_file",
-//						"/usr/local/ycsb-0.1.4/workloads/"
-//								+ event.getClusterSpec().getConfiguration()
-//										.getString(YCSB_WORKLOAD_FILE, null)));
-//		addStatement(event,
-//				call("append_hosts_to_workload_file", workloadFileHostsParam));
+		addStatement(event, call("clone_experiment_repo", repo,LOCAL_EXPERIMENT_DIR));
 	}
 
 	private Set<Instance> getInstancesThatMatchTheRoles(Cluster cluster, ClusterActionEvent event) throws IOException {
@@ -179,19 +178,21 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		// print output into this report file
 		String reportOption = getReportFilePath(major, workload);
 		
-		String repo = event.getClusterSpec().getConfiguration()
-				.getString(WORKLOAD_REPO_GIT, null);
+//		String repo = event.getClusterSpec().getConfiguration()
+//				.getString(WORKLOAD_REPO_GIT, null);
 
 		if (experimentAction.equalsIgnoreCase(prepare)) {
-			// FIXME ?
-//			addStatement(event,
-//					call("update_workload_repo", repo));
+			// set the local experiment directory path
+			String experimentDir = LOCAL_EXPERIMENT_DIR;
+			// set the local benchmarking data dir
+			String benchmarkDir = BENCHMARKING_DATA_DIR;
+			// set the name of the workload file that we want use in the experiment
+			String workloadFileName = event.getClusterSpec().getConfiguration()
+					.getString(ExperimentParameters.YCSB_WORKLOAD_FILE,null);
 			addStatement(
 					event,
-					call("prepare",
-							"/usr/local/ycsb-0.1.4/workloads/"
-									+ event.getClusterSpec().getConfiguration()
-											.getString(ExperimentParameters.YCSB_WORKLOAD_FILE, null)));
+					call("prepare_ycsb",experimentDir,workloadFileName,benchmarkDir));
+			// add/replace the database hosts in the workload file
 			addStatement(event,
 					call("append_hosts_to_workload_file", workloadFileHostsParam));
 		} else if (experimentAction.equalsIgnoreCase(run)) {
@@ -201,11 +202,11 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 						call("execute_ycsb", load, dbOption, workloadOption,
 								reportOption+"-load"));
 			} else if(phase.equalsIgnoreCase(transaction)) {
-				// TODO
+				// TODO future work
 				// collect gossip messages in a log file and write into monitoring directory
 				// every 10 seconds
 				// timestamp -> CLUSTER STATUS
-				//TODO
+				//TODO future work
 				// wait 600 seconds
 				// move A+B parallel, then move C
 				// addStatement("sleep 600; nodetool move nodeA tokenA tptargetA && nodetool move nodeB tokenB tpTargetB; nodetool move nodeC tokenC tpTargetC")
@@ -215,15 +216,18 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 							reportOption));
 			}
 		} else if (experimentAction.equalsIgnoreCase(upload)) {
-			addStatement(event, call("upload_ycsb_results"));
+			String s3_bucket = config.getString(OBSERVATION_DATASTORE,null);	
+			addStatement(event, call("push_ycsb_data_to_s3",s3_bucket,BENCHMARKING_DATA_DIR));
 		}
 	}
 
 	private String getReportFilePath(String major, String workload) {
 		StringBuffer toReturn = new StringBuffer();
 		// construct path to ycsb report file for the given workload
-		toReturn.append(getYCSBRootPath(major, workload));
-		toReturn.append("reports/");
+		//toReturn.append(getYCSBRootPath(major, workload));
+		//toReturn.append("reports/");
+		toReturn.append(BENCHMARKING_DATA_DIR);
+		toReturn.append("/");
 		if (workload != null) {
 			// could be for example "performance/workloadb"
 			toReturn.append(workload);
@@ -236,7 +240,10 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 	private String getWorkloadFilePath(String major, String workload) {
 		StringBuffer toReturn = new StringBuffer();
 		// construct path to ycsb workload file
-		toReturn.append(getYCSBRootPath(major, workload));
+//		toReturn.append(getYCSBRootPath(major, workload));
+		// Path to the experiment dir.
+		String experimentDir = LOCAL_EXPERIMENT_DIR+"/";
+		toReturn.append(experimentDir);
 		if (workload != null) {
 			// could be for example "performance/workloadb"
 			toReturn.append(workload);
@@ -246,14 +253,14 @@ public class YcsbClusterActionHandler extends ClusterActionHandlerSupport {
 		return toReturn.toString();
 	}
 
-	private String getYCSBRootPath(String major, String workload) {
-		StringBuffer toReturn = new StringBuffer();
-		// construct path to ycsb workloads directory
-		toReturn.append("/usr/local/ycsb-");
-		toReturn.append(major);
-		toReturn.append("/workloads/");
-		return toReturn.toString();
-	}
+//	private String getYCSBRootPath(String major, String workload) {
+//		StringBuffer toReturn = new StringBuffer();
+//		// construct path to ycsb workloads directory
+//		toReturn.append("/usr/local/ycsb-");
+//		toReturn.append(major);
+//		toReturn.append("/workloads/");
+//		return toReturn.toString();
+//	}
 
 	@Override
 	protected void afterRunExperiment(ClusterActionEvent event)
