@@ -15,6 +15,6 @@
 # limitations under the License.
 #
 function execute_ycsb() {
-    /usr/local/ycsb-0.1.4/bin/ycsb $1 $2 -P $3 > $4
+    /usr/local/ycsb/bin/ycsb $1 $2 -P $3 > $4
 }
 

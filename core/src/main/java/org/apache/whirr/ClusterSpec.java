@@ -188,12 +188,18 @@ public class ClusterSpec {
 				"Whether or not to "
 						+ "automatically terminate all nodes when cluster launch fails for some reason."),
 
+		// ycsb-experiment-action
 		YCSB_EXPERIMENT_ACTION(String.class, false,
 				"The treatment action to be executed on the experimental unit."),
 
+		// ycsb-db
 		YCSB_DB(String.class, false, "The YCSB database binding."),
 
-		YCSB_WORKLOAD_FILE(String.class, false, "The YCSB workload file.");
+		// ycsb-workload
+		YCSB_WORKLOAD_FILE(String.class, false, "The YCSB workload file."),
+		
+		// ycsb-workload-phase
+		YCSB_WORKLOAD_PHASE(String.class, false, "The YCSB experiment phase. Can be one of: load, transaction");
 
 		private Class<?> type;
 		private boolean multipleArguments;

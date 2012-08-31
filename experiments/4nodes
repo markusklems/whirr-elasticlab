@@ -16,37 +16,41 @@
 #
 
 #
-# Setup an Apache Cassandra Cluster
+# Setup a YCSB Cluster
 # 
 
 # Read the Configuration Guide for more info:
 # http://whirr.apache.org/docs/latest/configuration-guide.html 
 
 # Change the cluster name here
-whirr.cluster-name=cassandra
+whirr.cluster-name=ycsb-cassandra-cluster
 
 # Setup your cloud credentials by copying conf/credentials.sample
 # to ~/.whirr/credentials and editing as needed
 
 # Change the name of cluster admin user
-whirr.cluster-user=${sys:user.name}
+#whirr.cluster-user=${sys:user.name}
+whirr.cluster-user=markus
+
+# YCSB configs
+whirr.ycsb.tarball.url=https://github.com/downloads/markusklems/YCSBX/ycsb-0.1.4.tar.gz
+whirr.ycsb.version.major=0.1.4
+whirr.ycsb-db=cassandra-10
+whirr.ycsb-workload-file=scale/workloada-04nodes
+whirr.ycsb-experiment-action=prepare
+whirr.ycsb.workload.repo.git=git@github.com:markusklems/YCSB-workloads.git
+
+# Cassandra configs
+whirr.cassandra.version.major=1.1.0
+whirr.cassandra.tarball.url=http://apache.mirror.iphh.net/cassandra/1.1.2/apache-cassandra-1.1.2-bin.tar.gz
 
 # Change the number of machines in the cluster here
-whirr.instance-templates=3 cassandra
-
-# By default use the user system SSH keys. Override them here.
-# whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
-# whirr.public-key-file=${whirr.private-key-file}.pub
-
-# Expert: specify the version of Cassandra to install.
-whirr.cassandra.version.major=1.1.0
-whirr.cassandra.tarball.url=http://apache.lehtivihrea.org/cassandra/1.1.0/apache-cassandra-1.1.0-bin.tar.gz
-
+whirr.instance-templates=1 ycsb, 4 cassandra+ganglia-monitor, 1 ganglia-metad
 whirr.provider=aws-ec2
 whirr.identity=${env:AWS_ACCESS_KEY_ID} 
 whirr.credential=${env:AWS_SECRET_ACCESS_KEY}
-whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
-whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
+whirr.private-key-file=${sys:user.home}/.ssh/whirr_git_rsa
+whirr.public-key-file=${sys:user.home}/.ssh/whirr_git_rsa.pub
 
 # repair configs
-whirr.repair-roles=cassandra
+whirr.repair-roles=cassandra ganglia-monitor

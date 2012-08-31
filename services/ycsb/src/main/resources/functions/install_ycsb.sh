@@ -18,15 +18,17 @@ function install_ycsb() {
 
   Y_MAJOR_VERSION=${1:-0.1.4}
   Y_TAR_URL=${2:-https://github.com/downloads/brianfrankcooper/YCSB/ycsb-0.1.4.tar.gz}
+  YCSB_HOME=/usr/local/ycsb
  
   y_tar_file=`basename $Y_TAR_URL`
   y_tar_dir=`echo $y_tar_file | awk -F '.tar.gz' '{print $1}'`
   
-  YCSB_HOME=/usr/local/$y_tar_dir
-  
   install_tarball_no_md5 $Y_TAR_URL
+  mv /usr/local/ycsb-$Y_MAJOR_VERSION $YCSB_HOME
  
   echo "export YCSB_HOME=$YCSB_HOME" >> /etc/profile
-  echo 'export PATH=$YCSB_HOME/bin:$PATH' >> /etc/profile 
+  #echo 'export PATH=$ENV_YCSB_HOME/bin:$PATH' >> /etc/profile 
   source /etc/profile
+  cp /etc/profile /etc/profile-copy
+
 }

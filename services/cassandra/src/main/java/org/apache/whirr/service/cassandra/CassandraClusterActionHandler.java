@@ -23,6 +23,7 @@ import static org.apache.whirr.service.FirewallManager.Rule;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.ExperimentParameters;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -102,12 +103,51 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
 
 		addStatement(event, call("configure_cassandra", seedServers));
 	}
+	
+	@Override
+	protected void beforeRunExperiment(ClusterActionEvent event)
+			throws IOException, InterruptedException {
+		ClusterSpec clusterSpec = event.getClusterSpec();
+		Configuration config = clusterSpec.getConfiguration();
+		Cluster cluster = event.getCluster();
+		Set<Instance> instances = cluster
+				.getInstancesMatching(role(CASSANDRA_ROLE));
 
+		event.getFirewallManager().addRule(
+				Rule.create().destination(instances)
+						.ports(CLIENT_PORT, JMX_PORT));
+
+		String experimentAction = config
+				.getString(ExperimentParameters.YCSB_EXPERIMENT_ACTION, null);
+//		final String phase = config.getString(ExperimentParameters.YCSB_WORKLOAD_PHASE, null);
+//		// experiment phase
+//		final String load = ExperimentParameters.EXPERIMENT_PHASE_VALUE.EXPERIMENT_PHASE_LOAD.toString();
+//		final String transaction = ExperimentParameters.EXPERIMENT_PHASE_VALUE.EXPERIMENT_PHASE_TRANSACTION.toString();
+		
+		final String prepare = ExperimentParameters.EXPERIMENT_ACTION_VALUE.EXPERIMENT_PREPARE
+				.toString();
+//		final String run = ExperimentParameters.EXPERIMENT_ACTION_VALUE.EXPERIMENT_RUN.toString();
+//		final String upload = ExperimentParameters.EXPERIMENT_ACTION_VALUE.EXPERIMENT_UPLOAD_DATA
+//				.toString();
+
+		if (experimentAction.equalsIgnoreCase(prepare)) {
+			// Configure the YCSB setup
+			String major = config.getString(MAJOR_VERSION, null);
+			String cassandraHome = getCassandraHomePath("apache-cassandra-"+major);
+			addStatement(event, call("configure_ycsb",cassandraHome));
+		}
+	}
+	
+	private String getCassandraHomePath(String cassandra) {
+		StringBuffer toReturn = new StringBuffer();
+		toReturn.append("/usr/local/");
+		toReturn.append(cassandra);
+		return toReturn.toString();
+	}
+	
 	@Override
 	protected void beforeStart(ClusterActionEvent event) {
 		addStatement(event, call("start_cassandra"));
-		// Configure the YCSB setup
-		addStatement(event, call("configure_ycsb"));
 	}
 
 	@Override

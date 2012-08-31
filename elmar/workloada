@@ -1,0 +1,15 @@
+recordcount=3000000
+operationcount=300000
+workload=com.yahoo.ycsb.workloads.CoreWorkload
+
+readallfields=true
+
+readproportion=0.8
+updateproportion=0.2
+scanproportion=0
+insertproportion=0
+
+requestdistribution=zipfian
+
+measurementtype=timeseries
+timeseries.granularity=15000

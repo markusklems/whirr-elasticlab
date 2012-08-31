@@ -14,17 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function configure_ycsb() {
-  echo 'export PATH=${1:-apache-cassandra-1.0}/bin:$PATH' >> /etc/profile
-  source /etc/profile
-
-  CREATE_TABLE_STATEMENTS=/usr/local/create_usertable
-
-  cat >$CREATE_TABLE_STATEMENTS <<END_OF_FILE
-create keyspace usertable with strategy_options = [{replication_factor:1}] and placement_strategy = 'org.apache.cassandra.locator.SimpleStrategy';
-use usertable;
-create column family data with comparator='AsciiType';
-END_OF_FILE
-  
-  cassandra-cli -f $CREATE_TABLE_STATEMENTS
+function push_ganglia_data_to_s3() {
+  MY_BUCKET=${1:-my-test-bucket-xyz1230987}
+  MONITORING_DATA_DIR=${2:-/usr/local/monitoring-data}
+  # make bucket
+  s3cmd mb "s3://$MY_BUCKET"
+  # put data in bucket
+  s3cmd put --recursive "$MONITORING_DATA_DIR" "s3://$MY_BUCKET/"
 }

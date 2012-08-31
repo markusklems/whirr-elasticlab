@@ -14,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-function upload_ycsb_results() {
-  cd /usr/local/ycsb-0.1.4/workloads/
-  git add -A
-  git commit -m "new reports"
-  git push
+function clone_experiment_repo() {
+  # the read-only link to the experiment repo on github
+  REMOTE_EXPERIMENT_REPO=${1:-git://github.com/markusklems/Experiments.git}
+  EXPERIMENT_DIR=${2:-/usr/local/experiments}
   
-  #git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" add /usr/local/ycsb-0.1.4/workloads/reports/*
-  #git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" commit -m "new reports"
-  #git --git-dir="/usr/local/ycsb-0.1.4/workloads/.git" push
+  # remove the existing experiment files (potentially from a previous experiment run)
+  rm -Rd "$EXPERIMENT_DIR"
+  
+  # clone repo from git in read-only mode
+  git clone "$REMOTE_EXPERIMENT_REPO" "$EXPERIMENT_DIR"
+  
 }

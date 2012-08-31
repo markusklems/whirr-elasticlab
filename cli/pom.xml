@@ -52,17 +52,35 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-cdh</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>whirr-ganglia</artifactId>
       <version>${project.version}</version>
     </dependency>
+     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-zookeeper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-ycsb</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+      <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-elasticsearch</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    
+<!-- 
+     <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>whirr-hadoop</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-cdh</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -75,22 +93,12 @@
       <artifactId>whirr-pig</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-zookeeper</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-elasticsearch</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
+     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-hbase</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
+<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-hama</artifactId>
       <version>${project.version}</version>
@@ -105,12 +113,7 @@
       <artifactId>whirr-chef</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-ycsb</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
+     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-yarn</artifactId>
       <version>${project.version}</version>
@@ -119,7 +122,8 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-solr</artifactId>
       <version>${project.version}</version>
-    </dependency>
+    </dependency> -->
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

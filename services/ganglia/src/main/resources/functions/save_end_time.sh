@@ -14,17 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function configure_ycsb() {
-  echo 'export PATH=${1:-apache-cassandra-1.0}/bin:$PATH' >> /etc/profile
-  source /etc/profile
-
-  CREATE_TABLE_STATEMENTS=/usr/local/create_usertable
-
-  cat >$CREATE_TABLE_STATEMENTS <<END_OF_FILE
-create keyspace usertable with strategy_options = [{replication_factor:1}] and placement_strategy = 'org.apache.cassandra.locator.SimpleStrategy';
-use usertable;
-create column family data with comparator='AsciiType';
-END_OF_FILE
-  
-  cassandra-cli -f $CREATE_TABLE_STATEMENTS
+function save_end_time() {
+  rm /usr/local/end_time
+  TIME=$(date +%s)
+  echo "$TIME" >> /usr/local/end_time
 }

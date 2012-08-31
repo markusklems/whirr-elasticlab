@@ -31,6 +31,7 @@ function install_cassandra() {
   echo "export CASSANDRA_HOME=$CASSANDRA_HOME" >> /etc/profile
   echo "export CASSANDRA_CONF=$C_CONF_DIR" >> /etc/profile
   echo 'export PATH=$CASSANDRA_HOME/bin:$PATH' >> /etc/profile
+  source /etc/profile
   
   mkdir -p /mnt/cassandra/logs
   ln -s /mnt/cassandra/logs $C_LOG_DIR

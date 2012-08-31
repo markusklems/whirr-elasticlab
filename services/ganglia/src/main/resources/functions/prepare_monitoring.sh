@@ -14,14 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function update_workload_repo() {
-  YCSB_WORKLOAD_REPO=${1:-git://github.com/markusklems/YCSB-workloads.git}
-  #YCSB_WORKLOAD_REPO_VERSION=${2:-HEAD}
+function prepare_monitoring() {
+  MONITORING_DATA_DIR=${1:-/usr/local/monitoring-data}
+  WORKLOAD=${2:-workloada}
   
-  # remove the existing workload files
-  rm -Rd /usr/local/ycsb-0.1.4/workloads
-  
-  # clone repo from git
-  git clone $YCSB_WORKLOAD_REPO /usr/local/ycsb-0.1.4/workloads
-  
+  #rm -Rd "$MONITORING_DATA_DIR" && echo "removed directory $MONITORING_DATA_DIR and content"
+  mkdir "$MONITORING_DATA_DIR" && echo "created directory $MONITORING_DATA_DIR"
+  mkdir -p "$MONITORING_DATA_DIR/$WORKLOAD" && echo "created directory $MONITORING_DATA_DIR/$WORKLOAD"
 }
