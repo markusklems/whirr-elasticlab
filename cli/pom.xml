@@ -63,16 +63,15 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-ycsb</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+      <version>${project.version}</version>      
+      </dependency>
+<!--       
       <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-elasticsearch</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    
-<!-- 
      <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-hadoop</artifactId>

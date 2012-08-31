@@ -190,7 +190,7 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
     int rc = launchCluster.run(null, out, err, Lists.<String>newArrayList(
         "--cluster-name", "test-cluster-launch",
         "--state-store", "none",
-        "--instance-templates", "1 zookeeper+cassandra, 1 zookeeper+elasticsearch",
+        "--instance-templates", "1 zookeeper+cassandra", //1 zookeeper+elasticsearch",
         "--provider", "stub",
         "--identity", "dummy",
         "--private-key-file", keys.get("private").getAbsolutePath()

@@ -28,7 +28,7 @@
 
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr</artifactId>
-  <version>0.8.0-SNAPSHOT</version>
+  <version>0.7.0-elasticlab</version>
   <packaging>pom</packaging>
 
   <name>Whirr</name>
@@ -37,16 +37,16 @@
   <inceptionYear>2010</inceptionYear>
 
   <modules>
-    <module>build-tools</module>  
+    <module>build-tools</module>
     <module>cli</module>
     <module>core</module>
     <module>examples</module>
     <module>services/cassandra</module>
     <module>services/ycsb</module>
     <module>services/ganglia</module>
-    <module>services/zookeeper</module>    
-    <module>services/elasticsearch</module>
-        
+    <module>services/zookeeper</module>
+<!--    <module>services/elasticsearch</module> -->
+
 <!--
     <module>services/hadoop</module>
     <module>services/yarn</module>
