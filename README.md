@@ -121,5 +121,5 @@ Here are [the instructions](https://cwiki.apache.org/confluence/display/WHIRR/Ho
 That's it.
 
  FAQ
- ----
+====
  * "Maven does not work!" - "Be sure to use Maven3"
