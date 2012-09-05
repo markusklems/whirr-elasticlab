@@ -115,7 +115,7 @@ Here are [the instructions](https://cwiki.apache.org/confluence/display/WHIRR/Ho
 
  * ~$ `git clone git://github.com/markusklems/whirr-elasticlab.git`
  * ~$ `cd whirr-elasticlab`
- * Whirr-elasticlab$ `mvn install` (must use Maven3)
+ * whirr-elasticlab$ `mvn install` (must use Maven3)
  * whirr-elasticlab$ `mvn eclipse:eclipse`
 
 That's it.
